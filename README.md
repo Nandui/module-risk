@@ -62,13 +62,23 @@ Sign in as `lead@example.com` / `risk-demo-1234`.
 
 ### Against a managed Postgres
 
-Neon, Vercel Postgres, or anything else that speaks Postgres 14+.
+Neon, Vercel Postgres, or anything else that speaks Postgres 14+. One command,
+from a machine that can reach it on port 5432:
 
 ```bash
-cp .env.example .env      # fill in the connection strings, see below
-npm run db:deploy         # prisma migrate deploy
-npm run db:seed
+DATABASE_URL='<owner, UNPOOLED host>' \
+POOLED_URL='<owner, pooled host>' \
+  node scripts/setup-remote-db.mjs
 ```
+
+It refuses to touch a database holding tables it does not own, migrates, creates
+and grants the app role, seeds, **proves row level security is in force by
+connecting as the app role**, and prints the variables to paste into Vercel.
+Additive only — it never drops or truncates, and is safe to re-run.
+
+Neon specifics (pooled vs unpooled, `pgbouncer=true`, what to do if the owner
+lacks `CREATEROLE`) are in
+[`docs/neon-and-vercel.md`](docs/neon-and-vercel.md).
 
 ## Two connection strings, and why
 
@@ -223,6 +233,9 @@ Environment variables:
 | `APP_DATABASE_URL` | The `module_risk_app` role. What the running app uses. |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect |
+
+See [`docs/neon-and-vercel.md`](docs/neon-and-vercel.md) for which Neon URL goes
+in which variable, and why the app must not run on the owner connection.
 
 `vercel.json` runs `prisma generate && prisma migrate deploy && next build`, and
 gives the two PDF routes 2 GB and 60 seconds — they run headless Chromium via

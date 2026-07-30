@@ -390,30 +390,51 @@ create policy revision_insert on "revision"
 -- the role that ran these migrations. This creates the least-privilege
 -- role the app connects as (APP_DATABASE_URL).
 --
--- Set its password before deploying:
+-- Wrapped so a hosted Postgres that withholds CREATEROLE cannot wedge the
+-- schema migration: the tables and policies matter more than the role, and
+-- scripts/setup-remote-db.mjs reports precisely what is missing. Set the
+-- password separately — nothing secret belongs in a committed migration:
 --   ALTER ROLE module_risk_app WITH PASSWORD '…';
 -- ===================================================================
 
 do $$
+declare
+  role_ready boolean := false;
 begin
-  if not exists (select 1 from pg_roles where rolname = 'module_risk_app') then
-    create role module_risk_app login;
+  begin
+    if not exists (select 1 from pg_roles where rolname = 'module_risk_app') then
+      create role module_risk_app login;
+    end if;
+    role_ready := true;
+  exception when insufficient_privilege then
+    raise warning
+      'Could not create role module_risk_app (no CREATEROLE). Create it by hand, then re-run the grants at the end of this migration.';
+  end;
+
+  if not role_ready then
+    return;
   end if;
+
+  grant usage on schema public to module_risk_app;
+
+  -- DML only. No DDL, no TRUNCATE: the app can never reshape or wipe a table.
+  grant select, insert, update, delete on all tables in schema public to module_risk_app;
+  grant usage, select on all sequences in schema public to module_risk_app;
+
+  -- The password hash is write-only from the app's point of view. Sign-in
+  -- reads it through a SECURITY DEFINER function instead, so a bug in an
+  -- ordinary query cannot select it.
+  revoke select on "profile" from module_risk_app;
+  grant select (
+    "id", "full_name", "email", "role", "is_active", "created_at"
+  ) on "profile" to module_risk_app;
+
+  -- New tables added by later migrations should reach the app role too.
+  alter default privileges in schema public
+    grant select, insert, update, delete on tables to module_risk_app;
+  alter default privileges in schema public
+    grant usage, select on sequences to module_risk_app;
 end $$;
-
-grant usage on schema public to module_risk_app;
-
--- DML only. No DDL, no TRUNCATE: the app can never reshape or wipe a table.
-grant select, insert, update, delete on all tables in schema public to module_risk_app;
-grant usage, select on all sequences in schema public to module_risk_app;
-
--- The password hash is write-only from the app's point of view. Sign-in
--- reads it through a SECURITY DEFINER function instead, so a bug in an
--- ordinary query cannot select it.
-revoke select on "profile" from module_risk_app;
-grant select (
-  "id", "full_name", "email", "role", "is_active", "created_at"
-) on "profile" to module_risk_app;
 
 -- Sign-in. Returns the stored hash for one email, and nothing else.
 -- SECURITY DEFINER so it can read a column the caller cannot.
@@ -428,10 +449,10 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 revoke all on function auth_credentials(text) from public;
-grant execute on function auth_credentials(text) to module_risk_app;
 
--- New tables added by later migrations should reach the app role too.
-alter default privileges in schema public
-  grant select, insert, update, delete on tables to module_risk_app;
-alter default privileges in schema public
-  grant usage, select on sequences to module_risk_app;
+do $$
+begin
+  if exists (select 1 from pg_roles where rolname = 'module_risk_app') then
+    grant execute on function auth_credentials(text) to module_risk_app;
+  end if;
+end $$;
