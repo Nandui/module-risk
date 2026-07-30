@@ -82,7 +82,7 @@ export function CommandPalette({
         {compact ? null : (
           <>
             <span className="flex-1 text-left">Jump to…</span>
-            <kbd className="rounded-[3px] border border-rule bg-surface-raised px-1 font-mono text-[0.6875rem] text-faint">
+            <kbd className="rounded-[3px] border border-rule bg-surface-raised px-1 font-mono text-[0.6875rem] text-muted">
               ⌘K
             </kbd>
           </>
@@ -104,10 +104,10 @@ export function CommandPalette({
               }
             >
               <div className="flex items-center gap-2 border-b border-rule px-3">
-                <Search aria-hidden className="size-4 shrink-0 text-faint" />
+                <Search aria-hidden className="size-4 shrink-0 text-muted" />
                 <Command.Input
                   placeholder="Search assessments, hazards, actions and centres"
-                  className="h-12 flex-1 bg-transparent text-ui-lg text-ink outline-none placeholder:text-faint"
+                  className="h-12 flex-1 bg-transparent text-ui-lg text-ink outline-none placeholder:text-muted"
                 />
               </div>
 
@@ -136,7 +136,7 @@ export function CommandPalette({
                           <span
                             aria-hidden
                             className={cn(
-                              "grid size-5 shrink-0 place-items-center stencil text-[0.625rem]",
+                              "grid size-5 shrink-0 place-items-center stencil text-stencil-xs",
                               bandMeta(item.score).fill,
                             )}
                           >
@@ -149,7 +149,7 @@ export function CommandPalette({
                           {item.label}
                         </span>
                         {item.detail ? (
-                          <span className="shrink-0 text-ui-sm text-faint">
+                          <span className="shrink-0 text-ui-sm text-muted">
                             {item.detail}
                           </span>
                         ) : null}

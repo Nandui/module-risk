@@ -50,7 +50,7 @@ export function AutosaveIndicator({
           {error ?? "Not saved. Check your connection and try again."}
         </>
       ) : (
-        <span className="text-faint">Changes save as you go</span>
+        <span className="text-muted">Changes save as you go</span>
       )}
     </p>
   );

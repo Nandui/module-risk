@@ -74,7 +74,7 @@ export const STATUS_META: Record<
   },
   archived: {
     label: "Archived",
-    chip: "border border-rule text-faint",
+    chip: "border border-rule text-muted",
     description: "Superseded or no longer in use.",
   },
 };
@@ -119,5 +119,5 @@ export const ACTION_STATE_META: Record<ActionState, { label: string; chip: strin
   open: { label: "Open", chip: "border border-rule-strong text-ink-soft" },
   due_soon: { label: "Due soon", chip: "border border-accent-line bg-accent-wash text-accent-ink" },
   overdue: { label: "Overdue", chip: "bg-risk-5-wash text-risk-5-ink ring-1 ring-risk-5" },
-  closed: { label: "Closed", chip: "border border-rule text-faint" },
+  closed: { label: "Closed", chip: "border border-rule text-muted" },
 };

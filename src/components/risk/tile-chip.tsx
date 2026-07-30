@@ -152,7 +152,7 @@ export function BandKey({ className }: { className?: string }) {
               {band}
             </span>
             <span className="text-ink-soft">{meta.label}</span>
-            <span className="font-mono text-data-xs text-faint">{meta.range}</span>
+            <span className="font-mono text-data-xs text-muted">{meta.range}</span>
           </span>
         );
       })}

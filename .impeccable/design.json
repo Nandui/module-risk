@@ -157,6 +157,10 @@
       "eyebrow": {
         "displayName": "Eyebrow",
         "purpose": "Small-caps labels: metadata terms, matrix axis labels, section markers."
+      },
+      "stencil-xs": {
+        "displayName": "Stencil XS",
+        "purpose": "The numeral or code inside a small square tile — band numbers, centre codes. Only ever inside a tile."
       }
     },
     "shadows": [
@@ -234,7 +238,7 @@
       "refersTo": "input-lg",
       "description": "The authoring density: 3rem tall, 16px text. Sized for one-handed tablet use during a site walk.",
       "html": "<label class=\"ds-label\" for=\"ds-i1\">Notes</label><input class=\"ds-input-lg\" id=\"ds-i1\" placeholder=\"What did you observe?\" />",
-      "css": ".ds-label { display: block; margin-bottom: 0.375rem; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: var(--color-ink-soft, oklch(0.4 0.014 208)); } .ds-input-lg { width: 100%; height: 3rem; padding: 0 0.875rem; border: 1px solid var(--color-rule-strong, oklch(0.82 0.008 180)); border-radius: 0.5rem; background: var(--color-surface-raised, #fff); color: var(--color-ink, oklch(0.196 0.017 208)); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.55; transition: border-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-input-lg::placeholder { color: var(--color-faint, oklch(0.68 0.01 200)); } .ds-input-lg:focus { border-color: var(--color-accent, oklch(0.512 0.083 201.5)); outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 0; }"
+      "css": ".ds-label { display: block; margin-bottom: 0.375rem; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: var(--color-ink-soft, oklch(0.4 0.014 208)); } .ds-input-lg { width: 100%; height: 3rem; padding: 0 0.875rem; border: 1px solid var(--color-rule-strong, oklch(0.82 0.008 180)); border-radius: 0.5rem; background: var(--color-surface-raised, #fff); color: var(--color-ink, oklch(0.196 0.017 208)); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.55; transition: border-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-input-lg::placeholder { color: var(--color-muted, oklch(0.52 0.012 200)); } .ds-input-lg:focus { border-color: var(--color-accent, oklch(0.512 0.083 201.5)); outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 0; }"
     },
     {
       "name": "Neutral Chip",
@@ -319,6 +323,11 @@
         "name": "The One Lift Rule",
         "body": "Exactly one element in this system rises off the surface, and it is the selected matrix cell. A second one devalues the first. If a new element seems to need elevation, it needs a hairline or a tone step instead.",
         "section": "elevation"
+      },
+      {
+        "name": "The Legible Floor Rule",
+        "body": "Every text tone in this system clears 4.5:1 on every surface it can land on. If a design needs something quieter than muted, the answer is less text, smaller text, or more space — never a lighter grey.",
+        "section": "colors"
       }
     ],
     "dos": [
@@ -337,7 +346,7 @@
       "Don't reach for a card, and never nest one.",
       "Don't use a risk colour on a control, except the danger button, whose meaning genuinely is severity.",
       "Don't replace the matrix with two dropdowns, however much simpler the form would be.",
-      "Don't let faint carry content. It is for placeholders and disabled text only.",
+      "Don't add a fourth grey below muted. One existed and every use of it failed contrast; the value that would have fixed it is muted.",
       "Don't ship the display face at its default width.",
       "Don't introduce a motif that belongs to only one room of the building. A centre is a pool and a hall and studios and changing rooms and plant rooms and soft play and outdoor pitches.",
       "Don't animate on scroll, bounce, or stagger. Motion is a 120ms state change or a 240ms settle, and everything collapses under prefers-reduced-motion.",

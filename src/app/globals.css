@@ -28,8 +28,16 @@
   /* Never pure #000 for text, never pure #FFF for the page. */
   --color-ink: oklch(0.196 0.017 208); /* deep cool near-black — board slate */
   --color-ink-soft: oklch(0.4 0.014 208);
-  --color-muted: oklch(0.535 0.012 200); /* AA on --surface at 4.69:1 */
-  --color-faint: oklch(0.68 0.01 200);
+  /* The quietest text tone there is. Tuned against --surface-sunk, the
+   * darkest surface it lands on, so it clears 4.5:1 everywhere rather than
+   * only on the page: 5.49 raised / 5.00 surface / 4.68 sunk.
+   *
+   * There is deliberately no tone below this one. A fourth grey existed
+   * (--faint, 2.87:1 at best) and was reached for whenever something
+   * should be quieter than muted — review dates, empty states, keyboard
+   * hints. None of it was legible, and it cannot be fixed by darkening:
+   * the value that clears 4.5:1 is muted. So the tone is gone. */
+  --color-muted: oklch(0.52 0.012 200);
   --color-surface: oklch(0.968 0.004 168); /* cool off-white — painted wall */
   --color-surface-raised: oklch(1 0 0); /* the only white, and only as a plane */
   --color-surface-sunk: oklch(0.945 0.005 180);
@@ -90,6 +98,12 @@
   --text-eyebrow--line-height: 1;
   --text-eyebrow--letter-spacing: 0.08em;
   --text-eyebrow--font-weight: 700;
+
+  /* The stencilled numeral inside a small square tile — band numbers,
+   * centre codes. Four components reached for a literal 0.625rem before this
+   * existed; 0.75rem overflows a 20px tile. */
+  --text-stencil-xs: 0.625rem;
+  --text-stencil-xs--line-height: 1;
 
   --text-data-xs: 0.75rem;
   --text-data-xs--line-height: 1.1;

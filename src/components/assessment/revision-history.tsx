@@ -41,7 +41,7 @@ export function RevisionHistory({ revisions }: { revisions: Revision[] }) {
                 <span className="block text-ui text-ink-soft">
                   {revision.reason ?? "No reason recorded"}
                 </span>
-                <span className="mt-0.5 block font-mono text-data-xs text-faint">
+                <span className="mt-0.5 block font-mono text-data-xs text-muted">
                   {formatDateTime(revision.createdAt)}
                 </span>
               </span>

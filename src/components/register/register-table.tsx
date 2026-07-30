@@ -100,7 +100,7 @@ export function RegisterTable({
                 <span className="inline-flex items-center gap-1.5">
                   <span
                     aria-hidden
-                    className="grid size-5 shrink-0 place-items-center bg-surface-sunk stencil text-[0.625rem] text-muted"
+                    className="grid size-5 shrink-0 place-items-center bg-surface-sunk stencil text-stencil-xs text-muted"
                   >
                     {row.original.centreCode}
                   </span>
@@ -134,7 +134,7 @@ export function RegisterTable({
               size="sm"
             />
           ) : (
-            <span className="text-faint">—</span>
+            <span className="text-muted">—</span>
           ),
       },
       {
@@ -155,7 +155,7 @@ export function RegisterTable({
               />
             </span>
           ) : (
-            <span className="text-faint">No findings yet</span>
+            <span className="text-muted">No findings yet</span>
           ),
       },
       {
@@ -203,7 +203,7 @@ export function RegisterTable({
               <span
                 className={cn(
                   "block text-ui-sm",
-                  state === "overdue" ? "text-risk-5-ink" : "text-faint",
+                  state === "overdue" ? "text-risk-5-ink" : "text-muted",
                 )}
               >
                 {reviewLabel(row.original.reviewDueAt)}
@@ -293,7 +293,10 @@ export function RegisterTable({
                       <button
                         type="button"
                         onClick={header.column.getToggleSortingHandler()}
-                        className="eyebrow inline-flex items-center gap-1 hover:text-ink"
+                        // The eyebrow is 12px tall; the negative margin buys a
+                        // 24px hit area (WCAG 2.2 SC 2.5.8) without moving the
+                        // header or changing the row height.
+                        className="eyebrow -my-1.5 inline-flex min-h-6 items-center gap-1 py-1.5 hover:text-ink"
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {sorted === "asc" ? (

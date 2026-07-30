@@ -83,7 +83,7 @@ function OwnerGroup({ group }: { group: Group }) {
             "grid size-6 shrink-0 place-items-center rounded-full font-mono text-[0.625rem]",
             group.ownerId
               ? "bg-accent-wash text-accent-ink"
-              : "border border-dashed border-rule-strong text-faint",
+              : "border border-dashed border-rule-strong text-muted",
           )}
         >
           {group.ownerId ? initials(group.ownerName) : "?"}
@@ -138,7 +138,7 @@ function ActionRow({ row }: { row: ActionListRow }) {
           <p
             className={cn(
               "text-ui text-ink",
-              row.state === "closed" && "line-through decoration-faint",
+              row.state === "closed" && "line-through decoration-muted",
             )}
           >
             {row.description}
@@ -146,7 +146,7 @@ function ActionRow({ row }: { row: ActionListRow }) {
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-ui-sm text-muted">
             <span
               aria-hidden
-              className="grid size-4 shrink-0 place-items-center bg-surface-sunk stencil text-[0.5625rem]"
+              className="grid size-4 shrink-0 place-items-center bg-surface-sunk stencil text-stencil-xs"
             >
               {row.centreCode}
             </span>
@@ -230,7 +230,7 @@ function ActionRow({ row }: { row: ActionListRow }) {
               name="closureNote"
               autoFocus
               placeholder="Matting fitted along the deep-end walkway"
-              className="mt-1 h-9 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised px-2.5 text-ui text-ink placeholder:text-faint focus:border-accent"
+              className="mt-1 h-9 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised px-2.5 text-ui text-ink placeholder:text-muted focus:border-accent"
             />
           </label>
           <Button type="submit" variant="ink" size="sm" disabled={pending}>

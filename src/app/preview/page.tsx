@@ -323,7 +323,7 @@ function Section({
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid items-baseline gap-1 border-b border-rule pb-3 sm:grid-cols-[14rem_1fr]">
-      <p className="font-mono text-data-xs text-faint">{label}</p>
+      <p className="font-mono text-data-xs text-muted">{label}</p>
       {children}
     </div>
   );

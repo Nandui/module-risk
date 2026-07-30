@@ -64,7 +64,7 @@ export function ShortcutsSheet() {
       <Dialog.Trigger className="flex w-full items-center gap-2 rounded-[var(--radius)] px-2 py-1.5 text-ui-sm text-muted transition-colors duration-[var(--duration-quick)] hover:bg-surface-sunk hover:text-ink">
         <Keyboard aria-hidden className="size-3.5 shrink-0" />
         <span className="flex-1 text-left">Shortcuts</span>
-        <kbd className="rounded-[3px] border border-rule bg-surface-raised px-1 font-mono text-[0.6875rem] text-faint">
+        <kbd className="rounded-[3px] border border-rule bg-surface-raised px-1 font-mono text-[0.6875rem] text-muted">
           ?
         </kbd>
       </Dialog.Trigger>

@@ -64,7 +64,7 @@ export function CentreSwitcher({
             {current?.name ?? "All centres"}
           </span>
         </span>
-        <ChevronsUpDown aria-hidden className="size-3.5 shrink-0 text-faint" />
+        <ChevronsUpDown aria-hidden className="size-3.5 shrink-0 text-muted" />
       </Popover.Trigger>
 
       <Popover.Portal>
@@ -120,7 +120,7 @@ function Option({
       <span
         aria-hidden
         className={cn(
-          "grid size-6 shrink-0 place-items-center stencil text-[0.625rem]",
+          "grid size-6 shrink-0 place-items-center stencil text-stencil-xs",
           selected ? "bg-ink text-surface-raised" : "bg-surface-sunk text-muted",
         )}
       >
@@ -129,7 +129,7 @@ function Option({
       <span className="min-w-0 flex-1">
         <span className="block truncate text-ui text-ink">{name}</span>
         {detail ? (
-          <span className="block truncate text-ui-sm text-faint">{detail}</span>
+          <span className="block truncate text-ui-sm text-muted">{detail}</span>
         ) : null}
       </span>
       {selected ? <Check aria-hidden className="size-3.5 shrink-0 text-accent" /> : null}

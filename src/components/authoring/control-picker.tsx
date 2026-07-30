@@ -61,7 +61,7 @@ export function ControlPicker({
       <div className="relative">
         <Search
           aria-hidden
-          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-faint"
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
         />
         <input
           type="search"
@@ -70,7 +70,7 @@ export function ControlPicker({
           placeholder="Search controls"
           aria-label="Search control measures"
           disabled={disabled}
-          className="h-11 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised pl-9 pr-3 text-ui-lg text-ink placeholder:text-faint focus:border-accent"
+          className="h-11 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised pl-9 pr-3 text-ui-lg text-ink placeholder:text-muted focus:border-accent"
         />
       </div>
 
@@ -113,7 +113,7 @@ export function ControlPicker({
                   </span>
                   <span className="min-w-0 flex-1 text-ui text-ink">{control.label}</span>
                   {category && control.category === category ? (
-                    <span className="shrink-0 text-ui-sm text-faint">{control.category}</span>
+                    <span className="shrink-0 text-ui-sm text-muted">{control.category}</span>
                   ) : null}
                 </button>
               </li>

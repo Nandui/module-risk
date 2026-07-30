@@ -4,8 +4,7 @@ description: Health and safety risk assessments across a leisure centre group.
 colors:
   ink: "oklch(0.196 0.017 208)"
   ink-soft: "oklch(0.4 0.014 208)"
-  muted: "oklch(0.535 0.012 200)"
-  faint: "oklch(0.68 0.01 200)"
+  muted: "oklch(0.52 0.012 200)"
   surface: "oklch(0.968 0.004 168)"
   surface-raised: "oklch(1 0 0)"
   surface-sunk: "oklch(0.945 0.005 180)"
@@ -67,6 +66,12 @@ typography:
     fontSize: "0.8125rem"
     fontWeight: 400
     lineHeight: 1.35
+  stencil-xs:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.625rem"
+    fontWeight: 700
+    lineHeight: 1
+    fontVariation: "wdth 125"
   data-xs:
     fontFamily: "Geist Mono, ui-monospace, SFMono-Regular, monospace"
     fontSize: "0.75rem"
@@ -212,10 +217,12 @@ version for type on a light surface, and a wash for chip backgrounds.
 - **Board Slate** (`{colors.ink}`): All primary text, the sign-in panel, and
   terminal actions such as sign-off. Never pure black.
 - **Board Slate Soft** (`{colors.ink-soft}`): Secondary text, field labels.
-- **Muted** (`{colors.muted}`): Supporting prose and column headers. Holds
-  4.69:1 on the page surface — it is the lightest text tone permitted.
-- **Faint** (`{colors.faint}`): Placeholders and disabled text only. Never
-  used for content.
+- **Muted** (`{colors.muted}`): Every quiet text role — supporting prose,
+  column headers, placeholders, review dates, empty states, keyboard hints.
+  Tuned against `surface-sunk`, the darkest surface it lands on, so it clears
+  4.5:1 on all three: 5.49 raised, 5.00 surface, 4.68 sunk. **It is the
+  lightest text tone that exists**, and there is deliberately nothing below
+  it.
 - **Painted Wall** (`{colors.surface}`): The page. A cool off-white, never
   pure white.
 - **Card Stock** (`{colors.surface-raised}`): The only white in the system,
@@ -273,6 +280,9 @@ explains, mono measures.
   while standing.
 - **UI** (`{typography.ui}`): The interface default.
 - **UI Small** (`{typography.ui-sm}`): Register rows, chips, field labels.
+- **Stencil XS** (`{typography.stencil-xs}`): The numeral or code inside a
+  small square tile — band numbers in filter chips, centre codes. The only
+  step below the data role, and only ever inside a tile.
 - **Data XS** (`{typography.data-xs}`): References, dates, coordinates, any
   figure in a column. Tabular figures are forced globally, not left to a
   utility class being remembered.
@@ -335,8 +345,9 @@ floating card. It is the only place in the system where anything lifts, and
 that rationing is what makes it read as "this is the one you chose" at arm's
 length on a tablet.
 
-The one other use of shadow is the sheet overlay, which is a flat ink scrim at
-25% rather than a blur.
+The one other use of shadow is the sheet overlay: a flat ink scrim at 25%,
+carrying a 1px backdrop blur — just enough to stop fine table rules shimmering
+through the scrim, and far short of glass.
 
 ### Named Rules
 
@@ -344,6 +355,12 @@ The one other use of shadow is the sheet overlay, which is a flat ink scrim at
 surface, and it is the selected matrix cell. A second one devalues the first.
 If a new element seems to need elevation, it needs a hairline or a tone step
 instead.
+
+**The Legible Floor Rule.** Every text tone in this system clears 4.5:1 on
+every surface it can land on. If a design needs something quieter than
+`muted`, the answer is less text, smaller text, or more space — never a
+lighter grey. This rule exists because the palette once carried a fourth grey
+and all fifteen of its content uses failed WCAG AA.
 
 ## Shapes
 
@@ -498,8 +515,8 @@ reading a number.
   meaning genuinely is severity.
 - **Don't** replace the matrix with two dropdowns, however much simpler the
   form would be.
-- **Don't** let `faint` carry content. It is for placeholders and disabled
-  text only.
+- **Don't** add a fourth grey below `muted`. One existed and every use of it
+  failed contrast; the value that would have fixed it *is* `muted`.
 - **Don't** ship the display face at its default width.
 - **Don't** introduce a motif that belongs to only one room of the building.
   A centre is a pool and a hall and studios and changing rooms and plant rooms

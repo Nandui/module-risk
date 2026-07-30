@@ -79,7 +79,7 @@ export function LibraryBrowser({
             )}
           >
             {label}
-            <span className="ml-1.5 font-mono text-data-xs text-faint">{count}</span>
+            <span className="ml-1.5 font-mono text-data-xs text-muted">{count}</span>
           </button>
         ))}
       </div>
@@ -90,7 +90,7 @@ export function LibraryBrowser({
           <div className="relative min-w-48 flex-1 sm:max-w-72">
             <Search
               aria-hidden
-              className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-faint"
+              className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted"
             />
             <input
               type="search"
@@ -98,7 +98,7 @@ export function LibraryBrowser({
               onChange={(event) => setQuery(event.target.value)}
               placeholder={tab === "hazards" ? "Search hazards" : "Search controls"}
               aria-label="Search the library"
-              className="h-8 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised pl-8 pr-2 text-ui-sm text-ink placeholder:text-faint focus:border-accent"
+              className="h-8 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised pl-8 pr-2 text-ui-sm text-ink placeholder:text-muted focus:border-accent"
             />
           </div>
 

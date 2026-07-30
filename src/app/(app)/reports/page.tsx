@@ -96,7 +96,7 @@ export default async function ReportsPage() {
 
         <footer className="space-y-3 border-t border-rule pt-4">
           <BandKey />
-          <p className="font-mono text-data-xs text-faint">
+          <p className="font-mono text-data-xs text-muted">
             Generated {formatDateTime(data.generatedAt)} · Risk score is
             likelihood (1–5) × severity (1–5)
           </p>

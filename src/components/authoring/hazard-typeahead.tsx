@@ -47,7 +47,7 @@ export function HazardTypeahead({
           "hover:border-rule-strong focus:border-accent disabled:bg-surface-sunk",
         )}
       >
-        <span className={cn("min-w-0 flex-1 truncate", selected ? "text-ink" : "text-faint")}>
+        <span className={cn("min-w-0 flex-1 truncate", selected ? "text-ink" : "text-muted")}>
           {selected?.label ?? "Search the hazard library…"}
         </span>
         {selected ? (
@@ -60,7 +60,7 @@ export function HazardTypeahead({
             {selected.category}
           </span>
         ) : null}
-        <ChevronsUpDown aria-hidden className="size-4 shrink-0 text-faint" />
+        <ChevronsUpDown aria-hidden className="size-4 shrink-0 text-muted" />
       </Popover.Trigger>
 
       <Popover.Portal>
@@ -80,7 +80,7 @@ export function HazardTypeahead({
               onValueChange={setQuery}
               autoFocus
               placeholder="Type to search hazards"
-              className="h-11 w-full border-b border-rule bg-transparent px-3.5 text-ui-lg text-ink outline-none placeholder:text-faint"
+              className="h-11 w-full border-b border-rule bg-transparent px-3.5 text-ui-lg text-ink outline-none placeholder:text-muted"
             />
 
             <Command.List className="max-h-72 overflow-y-auto p-1.5">
@@ -109,7 +109,7 @@ export function HazardTypeahead({
                       <span className="min-w-0 flex-1 text-ui text-ink">
                         {hazard.label}
                       </span>
-                      <span className="shrink-0 text-ui-sm text-faint">
+                      <span className="shrink-0 text-ui-sm text-muted">
                         {used ? "already added" : hazard.category}
                       </span>
                     </span>

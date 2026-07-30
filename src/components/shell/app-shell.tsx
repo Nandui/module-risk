@@ -73,7 +73,7 @@ export function AppShell({
               <span className="block truncate text-ui-sm text-ink">
                 {session.profile.fullName}
               </span>
-              <span className="block truncate text-ui-sm text-faint">
+              <span className="block truncate text-ui-sm text-muted">
                 {ROLE_META[session.profile.role].label}
               </span>
             </span>

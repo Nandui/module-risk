@@ -37,7 +37,7 @@ export default async function AuthorPage({
         <div className="min-w-0">
           <p className="eyebrow">
             {detail.centre?.name ?? "Unknown centre"}
-            <span className="ml-2 font-mono normal-case tracking-normal text-faint">
+            <span className="ml-2 font-mono normal-case tracking-normal text-muted">
               {detail.assessment.reference}
             </span>
           </p>

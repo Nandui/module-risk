@@ -161,7 +161,7 @@ export function FilterBar({
         <div className="relative min-w-48 flex-1 sm:max-w-72">
           <Search
             aria-hidden
-            className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-faint"
+            className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted"
           />
           <input
             ref={searchRef}
@@ -170,7 +170,7 @@ export function FilterBar({
             onChange={(event) => onQueryChange(event.target.value)}
             placeholder="Filter by reference, title, centre or assessor"
             aria-label="Filter the register"
-            className="h-8 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised pl-8 pr-2 text-ui-sm text-ink placeholder:text-faint focus:border-accent"
+            className="h-8 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised pl-8 pr-2 text-ui-sm text-ink placeholder:text-muted focus:border-accent"
           />
         </div>
 
@@ -204,7 +204,7 @@ export function FilterBar({
               aria-pressed={active}
               title={`${meta.label} · ${meta.range}`}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-[3px] border px-1.5 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+                "inline-flex min-h-6 items-center gap-1.5 rounded-[3px] border px-1.5 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
                 active
                   ? "border-ink bg-surface-raised text-ink"
                   : "border-rule-strong text-muted hover:text-ink",
@@ -213,7 +213,7 @@ export function FilterBar({
               <span
                 aria-hidden
                 className={cn(
-                  "grid size-4 shrink-0 place-items-center stencil text-[0.625rem]",
+                  "grid size-4 shrink-0 place-items-center stencil text-stencil-xs",
                   meta.fill,
                 )}
               >
@@ -290,7 +290,7 @@ export function FilterBar({
               type="button"
               onClick={() => persist(views.filter((v) => v.name !== view.name))}
               aria-label={`Delete the ${view.name} view`}
-              className="grid size-5 place-items-center rounded-[3px] text-faint hover:text-risk-5-ink"
+              className="grid size-5 place-items-center rounded-[3px] text-muted hover:text-risk-5-ink"
             >
               <X aria-hidden className="size-3" />
             </button>
@@ -327,7 +327,7 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-[3px] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+        "inline-flex min-h-6 items-center gap-1.5 rounded-[3px] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
         active
           ? "border-ink bg-ink text-surface-raised"
           : "border-rule-strong bg-surface-raised text-muted hover:text-ink",

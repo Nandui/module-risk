@@ -25,7 +25,7 @@ export const Label = React.forwardRef<
 Label.displayName = "Label";
 
 const fieldBase =
-  "w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised text-ink placeholder:text-faint transition-colors duration-[var(--duration-quick)] hover:border-rule-strong focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent aria-[invalid=true]:border-risk-5 disabled:bg-surface-sunk disabled:text-muted";
+  "w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised text-ink placeholder:text-muted transition-colors duration-[var(--duration-quick)] hover:border-rule-strong focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent aria-[invalid=true]:border-risk-5 disabled:bg-surface-sunk disabled:text-muted";
 
 const sizes = {
   md: "h-9 px-2.5 text-ui",

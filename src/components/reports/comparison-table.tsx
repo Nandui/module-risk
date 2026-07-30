@@ -112,7 +112,7 @@ export function ComparisonTable({
                     </span>
                   </span>
                 ) : (
-                  <span className="text-faint">—</span>
+                  <span className="text-muted">—</span>
                 )}
               </td>
               <Td>{centre.meanReductionPct}%</Td>

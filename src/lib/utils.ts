@@ -13,6 +13,7 @@ import { DUE_SOON_DAYS, type ActionState } from "@/lib/vocab";
  */
 const FONT_SIZES = [
   "eyebrow",
+  "stencil-xs",
   "data-xs",
   "ui-sm",
   "ui",

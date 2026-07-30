@@ -100,7 +100,7 @@ export function AssessmentDocument({
                 detail.assessment.reviewDueAt &&
                   new Date(detail.assessment.reviewDueAt) < new Date()
                   ? "text-risk-5-ink"
-                  : "text-faint",
+                  : "text-muted",
               )}
             >
               {reviewLabel(assessment.reviewDueAt)}
@@ -186,7 +186,7 @@ export function AssessmentDocument({
                 <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 print-keep print-keep-next">
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2">
-                      <span className="font-mono text-data-xs text-faint">
+                      <span className="font-mono text-data-xs text-muted">
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span
@@ -260,14 +260,14 @@ export function AssessmentDocument({
                       <dd className="mt-1 font-mono text-data-xs text-ink-soft">
                         Initial {finding.likelihood}×{finding.severity} ={" "}
                         {finding.initialScore}{" "}
-                        <span className="text-faint">
+                        <span className="text-muted">
                           ({LIKELIHOOD_LABELS[finding.likelihood - 1]} ×{" "}
                           {SEVERITY_LABELS[finding.severity - 1]})
                         </span>
                         <br />
                         Residual {finding.residualLikelihood}×
                         {finding.residualSeverity} = {finding.residualScore}{" "}
-                        <span className="text-faint">
+                        <span className="text-muted">
                           ({bandMeta(finding.residualScore).label})
                         </span>
                       </dd>
@@ -293,7 +293,7 @@ export function AssessmentDocument({
                           <span
                             className={cn(
                               "text-ink-soft",
-                              action.closedAt && "line-through decoration-faint",
+                              action.closedAt && "line-through decoration-muted",
                             )}
                           >
                             {action.description}
