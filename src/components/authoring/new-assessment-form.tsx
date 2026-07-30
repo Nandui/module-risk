@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Check } from "lucide-react";
-import type { CentreRow, TemplateRow } from "@/lib/db/types";
+import type { Centre, Template } from "@prisma/client";
 import { REVIEW_FREQUENCIES, CATEGORY_META } from "@/lib/vocab";
 import { createAssessment } from "@/lib/actions/assessments";
 import { cn, plural } from "@/lib/utils";
@@ -14,8 +14,8 @@ export function NewAssessmentForm({
   templates,
   defaultCentreId,
 }: {
-  centres: CentreRow[];
-  templates: TemplateRow[];
+  centres: Centre[];
+  templates: Template[];
   defaultCentreId: string | null;
 }) {
   const [centreId, setCentreId] = React.useState(defaultCentreId ?? centres[0]?.id ?? "");
@@ -49,10 +49,10 @@ export function NewAssessmentForm({
       className="measure space-y-8"
       noValidate
     >
-      <Field label="Centre" htmlFor="centre_id" error={fieldErrors.centre_id}>
+      <Field label="Centre" htmlFor="centreId" error={fieldErrors.centreId}>
         <Select
-          id="centre_id"
-          name="centre_id"
+          id="centreId"
+          name="centreId"
           inputSize="lg"
           value={centreId}
           onChange={(event) => setCentreId(event.target.value)}
@@ -72,7 +72,7 @@ export function NewAssessmentForm({
           Sets the hazards you are walked through. You can add or skip any of
           them as you go.
         </p>
-        <input type="hidden" name="template_id" value={templateId} />
+        <input type="hidden" name="templateId" value={templateId} />
 
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {templates.map((option) => {
@@ -104,8 +104,8 @@ export function NewAssessmentForm({
                   <span className="block text-ui-lg text-ink">{option.name}</span>
                   <span className="mt-0.5 flex items-center gap-2">
                     <span className="font-mono text-data-xs text-muted">
-                      {option.hazard_ids.length}{" "}
-                      {plural(option.hazard_ids.length, "hazard")}
+                      {option.hazardIds.length}{" "}
+                      {plural(option.hazardIds.length, "hazard")}
                     </span>
                     <span
                       className={cn(
@@ -145,21 +145,21 @@ export function NewAssessmentForm({
 
       <Field
         label="Scope"
-        htmlFor="scope_note"
-        error={fieldErrors.scope_note}
+        htmlFor="scopeNote"
+        error={fieldErrors.scopeNote}
         hint="What this assessment covers, and anything it deliberately excludes."
       >
-        <Textarea id="scope_note" name="scope_note" />
+        <Textarea id="scopeNote" name="scopeNote" />
       </Field>
 
       <Field
         label="Review every"
-        htmlFor="review_frequency_months"
-        error={fieldErrors.review_frequency_months}
+        htmlFor="reviewFrequencyMonths"
+        error={fieldErrors.reviewFrequencyMonths}
       >
         <Select
-          id="review_frequency_months"
-          name="review_frequency_months"
+          id="reviewFrequencyMonths"
+          name="reviewFrequencyMonths"
           inputSize="lg"
           defaultValue={12}
         >

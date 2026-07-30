@@ -227,7 +227,7 @@ function ActionRow({ row }: { row: ActionListRow }) {
           <label className="min-w-48 flex-1">
             <span className="eyebrow block">What was done</span>
             <input
-              name="closure_note"
+              name="closureNote"
               autoFocus
               placeholder="Matting fitted along the deep-end walkway"
               className="mt-1 h-9 w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised px-2.5 text-ui text-ink placeholder:text-faint focus:border-accent"

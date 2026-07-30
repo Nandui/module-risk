@@ -1,0 +1,297 @@
+// ==================================================================
+// module-risk — data model.
+//
+// Single organisation, multiple centres. `centreId` is a first-class
+// dimension on every record that belongs to a centre, from the first
+// commit. There is no `org` column and no multi-tenancy to add later.
+//
+// Columns stay snake_case (via @map) so the raw SQL in the migrations —
+// the triggers, the RLS policies — reads the same as the schema.
+//
+// Two guarantees live in the database rather than in application code,
+// so the audit trail holds even against a direct SQL write. See
+// migrations/*_guards_and_rls/migration.sql:
+//   1. assessments are append-only once signed off
+//   2. controls only ever reduce risk
+// ==================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Owner role: migrations and seed. Bypasses RLS, which is why it is
+  // never the connection the app runs on.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---- enums — controlled vocabulary in the type system ------------
+
+enum HazardCategory {
+  Physical
+  Chemical
+  Biological
+  Ergonomic
+  Psychosocial
+  Environmental
+
+  @@map("hazard_category")
+}
+
+enum PersonAtRisk {
+  Staff
+  Customers
+  Children
+  Contractors
+  Visitors
+
+  @@map("person_at_risk")
+}
+
+enum AssessmentStatus {
+  draft
+  in_review
+  signed_off
+  archived
+
+  @@map("assessment_status")
+}
+
+enum UserRole {
+  assessor
+  manager
+  hs_lead
+
+  @@map("user_role")
+}
+
+/// Library entries added mid-walk are flagged for the H&S lead rather
+/// than silently joining the controlled vocabulary.
+enum LibraryReviewState {
+  approved
+  pending_review
+  rejected
+
+  @@map("library_review_state")
+}
+
+// ---- people -----------------------------------------------------
+
+/// One row per person. Auth.js holds the session; this holds identity,
+/// role and the password hash.
+model Profile {
+  id           String   @id @default(uuid()) @db.Uuid
+  fullName     String   @map("full_name")
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  role         UserRole @default(assessor)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  centres           CentreMember[]
+  assessed          Assessment[]   @relation("Assessor")
+  reviewed          Assessment[]   @relation("Reviewer")
+  signedOff         Assessment[]   @relation("Signatory")
+  ownedActions      Action[]       @relation("ActionOwner")
+  closedActions     Action[]       @relation("ActionCloser")
+  revisions         Revision[]
+  proposedHazards   Hazard[]
+  proposedControls  ControlMeasure[]
+
+  @@map("profile")
+}
+
+model Centre {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  /// Short site code (BT, HT). Used in assessment references.
+  code      String   @unique
+  address   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  members     CentreMember[]
+  assessments Assessment[]
+  actions     Action[]
+  revisions   Revision[]
+
+  @@map("centre")
+}
+
+/// Which centres a person works across. The H&S lead sees every centre
+/// without needing a row here.
+model CentreMember {
+  centreId  String @map("centre_id") @db.Uuid
+  profileId String @map("profile_id") @db.Uuid
+
+  centre  Centre  @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([centreId, profileId])
+  @@map("centre_member")
+}
+
+// ---- libraries — controlled vocabulary --------------------------
+
+/// Selected by typeahead. "Add new" is deliberate and flags for review.
+model Hazard {
+  id          String             @id @default(uuid()) @db.Uuid
+  label       String
+  category    HazardCategory
+  guidance    String?
+  reviewState LibraryReviewState @default(approved) @map("review_state")
+  createdById String?            @map("created_by") @db.Uuid
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  createdBy Profile?  @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  findings  Finding[]
+
+  @@unique([label, category])
+  @@map("hazard")
+}
+
+model ControlMeasure {
+  id          String             @id @default(uuid()) @db.Uuid
+  label       String             @unique
+  category    HazardCategory
+  reviewState LibraryReviewState @default(approved) @map("review_state")
+  createdById String?            @map("created_by") @db.Uuid
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  createdBy Profile? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@map("control_measure")
+}
+
+model Template {
+  id        String         @id @default(uuid()) @db.Uuid
+  name      String         @unique
+  category  HazardCategory
+  /// Ordered hazard library ids this template walks the assessor through.
+  hazardIds String[]       @map("hazard_ids") @db.Uuid
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  assessments Assessment[]
+
+  @@map("template")
+}
+
+// ---- the assessment document ------------------------------------
+
+model Assessment {
+  id                    String           @id @default(uuid()) @db.Uuid
+  reference             String           @unique @default("")
+  centreId              String           @map("centre_id") @db.Uuid
+  templateId            String?          @map("template_id") @db.Uuid
+  title                 String
+  status                AssessmentStatus @default(draft)
+  assessorId            String?          @map("assessor_id") @db.Uuid
+  reviewedById          String?          @map("reviewed_by") @db.Uuid
+  reviewFrequencyMonths Int              @default(12) @map("review_frequency_months")
+  reviewDueAt           DateTime?        @map("review_due_at") @db.Timestamptz(6)
+  signedOffAt           DateTime?        @map("signed_off_at") @db.Timestamptz(6)
+  signedOffById         String?          @map("signed_off_by") @db.Uuid
+  /// Free text is fine here: a scope note is read by humans, never
+  /// aggregated across centres.
+  scopeNote             String?          @map("scope_note")
+  createdAt             DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  centre      Centre     @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  template    Template?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  assessor    Profile?   @relation("Assessor", fields: [assessorId], references: [id], onDelete: SetNull)
+  reviewedBy  Profile?   @relation("Reviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  signedOffBy Profile?   @relation("Signatory", fields: [signedOffById], references: [id], onDelete: SetNull)
+  findings    Finding[]
+  revisions   Revision[]
+
+  @@index([centreId])
+  @@index([status])
+  @@index([reviewDueAt])
+  @@index([assessorId])
+  @@map("assessment")
+}
+
+model Finding {
+  id           String @id @default(uuid()) @db.Uuid
+  assessmentId String @map("assessment_id") @db.Uuid
+  hazardId     String @map("hazard_id") @db.Uuid
+  sortOrder    Int    @default(0) @map("sort_order")
+
+  /// Initial (pre-control) risk.
+  likelihood Int
+  severity   Int
+
+  controlMeasureIds String[] @map("control_measure_ids") @db.Uuid
+
+  /// Residual (post-control) risk. Both stages are stored — the delta is
+  /// the most persuasive number in any report and cannot be recomputed
+  /// from the controls.
+  residualLikelihood Int @map("residual_likelihood")
+  residualSeverity   Int @map("residual_severity")
+
+  personsAtRisk PersonAtRisk[] @map("persons_at_risk")
+  notes         String?
+  /// Vercel Blob URLs for photo evidence.
+  photoIds      String[]       @map("photo_ids")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  hazard     Hazard     @relation(fields: [hazardId], references: [id])
+  actions    Action[]
+
+  @@unique([assessmentId, hazardId])
+  @@index([assessmentId])
+  @@index([hazardId])
+  @@map("finding")
+}
+
+model Action {
+  id        String @id @default(uuid()) @db.Uuid
+  findingId String @map("finding_id") @db.Uuid
+  /// Denormalised so the group-wide Actions screen and its RLS check do
+  /// not have to walk two joins on every row. Kept honest by a trigger.
+  centreId  String @map("centre_id") @db.Uuid
+
+  description String
+  ownerId     String?   @map("owner_id") @db.Uuid
+  dueAt       DateTime? @map("due_at") @db.Timestamptz(6)
+  closedAt    DateTime? @map("closed_at") @db.Timestamptz(6)
+  closedById  String?   @map("closed_by") @db.Uuid
+  closureNote String?   @map("closure_note")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  finding  Finding  @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  centre   Centre   @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  owner    Profile? @relation("ActionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  closedBy Profile? @relation("ActionCloser", fields: [closedById], references: [id], onDelete: SetNull)
+
+  @@index([centreId])
+  @@index([findingId])
+  @@map("action")
+}
+
+/// Append-only. A correction to a signed record creates a new revision;
+/// it never mutates the record. The snapshot is the whole document, so a
+/// revision stays readable if the live rows later change shape.
+model Revision {
+  id           String   @id @default(uuid()) @db.Uuid
+  assessmentId String   @map("assessment_id") @db.Uuid
+  centreId     String   @map("centre_id") @db.Uuid
+  revisionNo   Int      @map("revision_no")
+  snapshot     Json
+  reason       String?
+  createdById  String?  @map("created_by") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  centre     Centre     @relation(fields: [centreId], references: [id], onDelete: Cascade)
+  createdBy  Profile?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([assessmentId, revisionNo])
+  @@index([assessmentId, revisionNo])
+  @@map("revision")
+}

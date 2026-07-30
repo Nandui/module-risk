@@ -28,15 +28,15 @@ const optionalText = (max: number, field: string) =>
 // ---- assessment ---------------------------------------------------
 
 export const assessmentSchema = z.object({
-  centre_id: uuid.describe("centre"),
-  template_id: uuid.optional(),
+  centreId: uuid.describe("centre"),
+  templateId: uuid.optional(),
   title: z
     .string()
     .trim()
     .min(3, "Give the assessment a title so it can be found in the register.")
     .max(160, "Keep the title under 160 characters."),
-  scope_note: optionalText(2000, "the scope note"),
-  review_frequency_months: z.coerce
+  scopeNote: optionalText(2000, "the scope note"),
+  reviewFrequencyMonths: z.coerce
     .number()
     .int()
     .min(1, "Reviews happen at least once every 60 months.")
@@ -55,34 +55,34 @@ export const assessmentStatusSchema = z.object({
 export const findingSchema = z
   .object({
     id: uuid.optional(),
-    assessment_id: uuid,
-    hazard_id: uuid.describe("hazard"),
+    assessmentId: uuid,
+    hazardId: uuid.describe("hazard"),
     likelihood: rating,
     severity: rating,
-    control_measure_ids: z
+    controlMeasureIds: z
       .array(uuid)
       .default([])
       .refine((v) => new Set(v).size === v.length, "That control is already selected."),
-    residual_likelihood: rating,
-    residual_severity: rating,
-    persons_at_risk: z.array(z.enum(PERSONS_AT_RISK)).default([]),
+    residualLikelihood: rating,
+    residualSeverity: rating,
+    personsAtRisk: z.array(z.enum(PERSONS_AT_RISK)).default([]),
     notes: optionalText(2000, "the notes"),
-    photo_ids: z.array(z.string().min(1)).default([]),
+    photoIds: z.array(z.string().min(1)).default([]),
   })
   .refine(
-    (f) => f.residual_likelihood * f.residual_severity <= f.likelihood * f.severity,
+    (f) => f.residualLikelihood * f.residualSeverity <= f.likelihood * f.severity,
     {
       // The database refuses this too. Catching it here means the assessor
       // gets a sentence rather than a constraint violation.
       message:
         "Residual risk cannot be higher than the initial risk — controls only ever reduce it. Check the two matrix selections.",
-      path: ["residual_likelihood"],
+      path: ["residualLikelihood"],
     },
   )
-  .refine((f) => f.control_measure_ids.length > 0 || f.residual_likelihood * f.residual_severity === f.likelihood * f.severity, {
+  .refine((f) => f.controlMeasureIds.length > 0 || f.residualLikelihood * f.residualSeverity === f.likelihood * f.severity, {
     message:
       "Residual risk is lower than the initial risk, so select the controls that bring it down.",
-    path: ["control_measure_ids"],
+    path: ["controlMeasureIds"],
   });
 
 export type FindingInput = z.infer<typeof findingSchema>;
@@ -91,14 +91,14 @@ export type FindingInput = z.infer<typeof findingSchema>;
 
 export const actionSchema = z.object({
   id: uuid.optional(),
-  finding_id: uuid,
+  findingId: uuid,
   description: z
     .string()
     .trim()
     .min(5, "Describe what needs doing, so whoever picks this up knows the task.")
     .max(500, "Keep the description under 500 characters."),
-  owner_id: uuid.optional(),
-  due_at: z
+  ownerId: uuid.optional(),
+  dueAt: z
     .string()
     .trim()
     .min(1, "Set a due date — an action without one never gets done.")
@@ -109,7 +109,7 @@ export type ActionInput = z.infer<typeof actionSchema>;
 
 export const closeActionSchema = z.object({
   id: uuid,
-  closure_note: optionalText(500, "the closure note"),
+  closureNote: optionalText(500, "the closure note"),
 });
 
 // ---- library additions --------------------------------------------
@@ -157,7 +157,7 @@ export const signOffSchema = z.object({
 // ---- revision -----------------------------------------------------
 
 export const revisionSchema = z.object({
-  assessment_id: uuid,
+  assessmentId: uuid,
   reason: z
     .string()
     .trim()

@@ -178,3 +178,30 @@ argument was a score or a band and reporting every residual of 5 as "Very high".
 `revision` row holding a full `jsonb` snapshot, and the trigger that blocks
 updates to signed rows lives in the database, not in application code — so the
 audit trail holds even against a direct SQL write.
+
+## 7. Persistence — changed after the first build
+
+The brief locked Supabase. It was built that way first, then moved to plain
+Postgres at the client's request: Neon or Vercel Postgres with Prisma, Auth.js
+v5 and Vercel Blob, matching the `centrely` suite so a developer can move
+between the two apps.
+
+What that costs and what it buys:
+
+- **Supabase Auth → Auth.js v5** (credentials + JWT sessions). The password hash
+  lives on `profile`, and the app role has *no* `SELECT` privilege on that
+  column — sign-in reads it through a `SECURITY DEFINER` function instead.
+- **Supabase Storage → Vercel Blob.** The browser uploads straight to Blob with
+  a short-lived token issued by `/api/blob/upload`, which checks the caller may
+  write to the centre named in the object path.
+- **RLS survived the move, and is now actually testable.** Supabase's
+  `auth.uid()` is replaced by a transaction-local session variable set by
+  `withUser()`. Because identity is a `set_config` call rather than a signed
+  JWT, the verification harness can be any role it likes — so RLS behaviour is
+  now covered by 13 assertions that were impossible to write before.
+
+The app connects as a least-privilege `module_risk_app` role, never as the
+owner: RLS does not apply to a table's owner, so running the app on the
+migration connection would silently disable every policy. `src/lib/db.ts`
+refuses to start in production without `APP_DATABASE_URL` for exactly that
+reason.

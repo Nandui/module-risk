@@ -6,8 +6,10 @@ const nextConfig: NextConfig = {
     // Register → detail uses the View Transitions API (see useViewTransition).
     viewTransition: true,
   },
-  // puppeteer-core is only ever imported from the Node runtime PDF route.
-  serverExternalPackages: ["puppeteer-core"],
+  // Neither belongs in a client or edge bundle: puppeteer-core is only
+  // imported from the Node runtime PDF routes, and Prisma ships a native
+  // engine that cannot be bundled.
+  serverExternalPackages: ["puppeteer-core", "@prisma/client", "bcryptjs"],
 };
 
 export default nextConfig;

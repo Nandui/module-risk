@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Check, Search, X } from "lucide-react";
-import type { ControlMeasureRow, HazardRow, TemplateRow } from "@/lib/db/types";
+import type { ControlMeasure, Hazard, Template } from "@prisma/client";
 import { CATEGORY_META, HAZARD_CATEGORIES, type HazardCategory } from "@/lib/vocab";
 import { cn, plural } from "@/lib/utils";
 import { reviewLibraryEntry } from "@/lib/actions/misc";
@@ -18,9 +18,9 @@ export function LibraryBrowser({
   templates,
   canReview,
 }: {
-  hazards: HazardRow[];
-  controls: ControlMeasureRow[];
-  templates: TemplateRow[];
+  hazards: Hazard[];
+  controls: ControlMeasure[];
+  templates: Template[];
   canReview: boolean;
 }) {
   const params = useSearchParams();
@@ -41,15 +41,15 @@ export function LibraryBrowser({
   };
 
   const shownHazards = hazards.filter((h) =>
-    matches(h.label, h.category, h.review_state),
+    matches(h.label, h.category, h.reviewState),
   );
   const shownControls = controls.filter((c) =>
-    matches(c.label, c.category, c.review_state),
+    matches(c.label, c.category, c.reviewState),
   );
 
   const pendingCount =
-    hazards.filter((h) => h.review_state === "pending_review").length +
-    controls.filter((c) => c.review_state === "pending_review").length;
+    hazards.filter((h) => h.reviewState === "pending_review").length +
+    controls.filter((c) => c.reviewState === "pending_review").length;
 
   return (
     <div>
@@ -175,7 +175,7 @@ export function LibraryBrowser({
                 >
                   {hazard.category}
                 </span>
-                {hazard.review_state === "pending_review" ? (
+                {hazard.reviewState === "pending_review" ? (
                   <ReviewControls
                     table="hazard"
                     id={hazard.id}
@@ -202,7 +202,7 @@ export function LibraryBrowser({
               >
                 {control.category}
               </span>
-              {control.review_state === "pending_review" ? (
+              {control.reviewState === "pending_review" ? (
                 <ReviewControls
                   table="control_measure"
                   id={control.id}
@@ -221,7 +221,7 @@ export function LibraryBrowser({
             <li key={template.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 sm:px-6">
               <span className="min-w-0 flex-1 text-ui text-ink">{template.name}</span>
               <span className="font-mono text-data-xs text-muted">
-                {template.hazard_ids.length} {plural(template.hazard_ids.length, "hazard")}
+                {template.hazardIds.length} {plural(template.hazardIds.length, "hazard")}
               </span>
               <span
                 className={cn(

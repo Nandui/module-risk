@@ -1,5 +1,14 @@
 import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
+import type {
+  Action,
+  Assessment,
+  Centre,
+  Finding,
+  HazardCategory,
+  Revision,
+} from "@prisma/client";
+import { query } from "@/lib/data/session";
+import type { AppProfile } from "@/lib/db";
 import {
   headlineInitialScore,
   headlineResidualScore,
@@ -9,16 +18,7 @@ import {
   type RiskBand,
 } from "@/lib/risk";
 import { reviewState, type ReviewState } from "@/lib/utils";
-import type {
-  ActionRow,
-  AssessmentRow,
-  CentreRow,
-  FindingRow,
-  ProfileRow,
-  RevisionRow,
-} from "@/lib/db/types";
-import type { AssessmentStatus, HazardCategory } from "@/lib/vocab";
-import { lookupMaps } from "@/lib/data/library";
+import type { AssessmentStatus } from "@/lib/vocab";
 
 /** One row of the register — everything the table needs, already derived. */
 export interface RegisterRow {
@@ -45,126 +45,100 @@ export interface RegisterRow {
 }
 
 /**
- * The register. One query per table rather than a nested select, because
- * PostgREST embedding on four levels produces a payload far larger than the
- * three flat reads it replaces.
+ * The register. `centreId` of null is the group-level view.
  *
- * `centreId` of null is the group-level view.
+ * One query with the relations Prisma can nest, rather than four flat reads
+ * stitched in memory — the join is what a relational database is for, and
+ * RLS applies to the nested selects too.
  */
 export const getRegister = cache(
-  async (centreId: string | null): Promise<RegisterRow[]> => {
-    const supabase = await createClient();
+  (centreId: string | null): Promise<RegisterRow[]> =>
+    query(async (tx) => {
+      const assessments = await tx.assessment.findMany({
+        where: centreId ? { centreId } : undefined,
+        orderBy: { createdAt: "desc" },
+        include: {
+          centre: { select: { name: true, code: true } },
+          assessor: { select: { fullName: true } },
+          findings: {
+            select: {
+              likelihood: true,
+              severity: true,
+              residualLikelihood: true,
+              residualSeverity: true,
+              _count: { select: { actions: true } },
+              actions: { where: { closedAt: null }, select: { id: true } },
+            },
+          },
+        },
+      });
 
-    let query = supabase
-      .from("assessment")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (centreId) query = query.eq("centre_id", centreId);
+      return assessments.map((a) => {
+        // The headline is the worst finding, not the mean. A register row
+        // must surface the worst thing in the document — averaging hides a
+        // 25 behind a page of 2s.
+        const initialScore = headlineInitialScore(
+          a.findings.map((f) => ({ likelihood: f.likelihood, severity: f.severity })),
+        );
+        const residualScore = headlineResidualScore(
+          a.findings.map((f) => ({
+            residual_likelihood: f.residualLikelihood,
+            residual_severity: f.residualSeverity,
+          })),
+        );
+        const worstInitial = a.findings.find(
+          (f) => riskScore(f.likelihood, f.severity) === initialScore,
+        );
+        const worstResidual = a.findings.find(
+          (f) => riskScore(f.residualLikelihood, f.residualSeverity) === residualScore,
+        );
 
-    const { data: assessments } = await query;
-    if (!assessments || assessments.length === 0) return [];
-
-    const ids = assessments.map((a) => a.id);
-
-    const [{ data: findings }, { data: centres }, { data: profiles }, { data: actions }] =
-      await Promise.all([
-        supabase
-          .from("finding")
-          .select(
-            "id, assessment_id, likelihood, severity, residual_likelihood, residual_severity",
-          )
-          .in("assessment_id", ids),
-        supabase.from("centre").select("*"),
-        supabase.from("profile").select("id, full_name"),
-        supabase
-          .from("action")
-          .select("id, finding_id, closed_at")
-          .is("closed_at", null),
-      ]);
-
-    const centreById = new Map((centres ?? []).map((c) => [c.id, c]));
-    const nameById = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
-
-    const byAssessment = new Map<string, typeof findings>();
-    const assessmentOfFinding = new Map<string, string>();
-    for (const f of findings ?? []) {
-      const list = byAssessment.get(f.assessment_id) ?? [];
-      list.push(f);
-      byAssessment.set(f.assessment_id, list);
-      assessmentOfFinding.set(f.id, f.assessment_id);
-    }
-
-    const openByAssessment = new Map<string, number>();
-    for (const a of actions ?? []) {
-      const assessmentId = assessmentOfFinding.get(a.finding_id);
-      if (!assessmentId) continue;
-      openByAssessment.set(assessmentId, (openByAssessment.get(assessmentId) ?? 0) + 1);
-    }
-
-    return assessments.map((a) => {
-      const rows = byAssessment.get(a.id) ?? [];
-      const centre = centreById.get(a.centre_id);
-
-      // The headline is the worst finding, not the mean. A register row must
-      // surface the worst thing in the document — averaging hides a 25
-      // behind a page of 2s.
-      const initialScore = headlineInitialScore(rows);
-      const residualScore = headlineResidualScore(rows);
-      const worstInitial =
-        rows.find((f) => riskScore(f.likelihood, f.severity) === initialScore) ?? null;
-      const worstResidual =
-        rows.find(
-          (f) => riskScore(f.residual_likelihood, f.residual_severity) === residualScore,
-        ) ?? null;
-
-      return {
-        id: a.id,
-        reference: a.reference,
-        title: a.title,
-        status: a.status,
-        centreId: a.centre_id,
-        centreName: centre?.name ?? "Unknown centre",
-        centreCode: centre?.code ?? "??",
-        assessorName: a.assessor_id
-          ? (nameById.get(a.assessor_id) ?? "Unassigned")
-          : "Unassigned",
-        reviewDueAt: a.review_due_at,
-        reviewState: reviewState(a.review_due_at),
-        findingCount: rows.length,
-        initialScore,
-        residualScore,
-        initialLikelihood: worstInitial?.likelihood ?? 0,
-        initialSeverity: worstInitial?.severity ?? 0,
-        residualLikelihood: worstResidual?.residual_likelihood ?? 0,
-        residualSeverity: worstResidual?.residual_severity ?? 0,
-        band: residualScore > 0 ? riskBand(residualScore) : null,
-        openActions: openByAssessment.get(a.id) ?? 0,
-        signedOffAt: a.signed_off_at,
-      } satisfies RegisterRow;
-    });
-  },
+        return {
+          id: a.id,
+          reference: a.reference,
+          title: a.title,
+          status: a.status,
+          centreId: a.centreId,
+          centreName: a.centre.name,
+          centreCode: a.centre.code,
+          assessorName: a.assessor?.fullName ?? "Unassigned",
+          reviewDueAt: a.reviewDueAt?.toISOString() ?? null,
+          reviewState: reviewState(a.reviewDueAt),
+          findingCount: a.findings.length,
+          initialScore,
+          residualScore,
+          initialLikelihood: worstInitial?.likelihood ?? 0,
+          initialSeverity: worstInitial?.severity ?? 0,
+          residualLikelihood: worstResidual?.residualLikelihood ?? 0,
+          residualSeverity: worstResidual?.residualSeverity ?? 0,
+          band: residualScore > 0 ? riskBand(residualScore) : null,
+          openActions: a.findings.reduce((n, f) => n + f.actions.length, 0),
+          signedOffAt: a.signedOffAt?.toISOString() ?? null,
+        } satisfies RegisterRow;
+      });
+    }),
 );
 
-export interface FindingDetail extends FindingRow {
+export interface FindingDetail extends Finding {
   hazardLabel: string;
   hazardCategory: HazardCategory;
   hazardGuidance: string | null;
   controls: { id: string; label: string }[];
-  actions: ActionRow[];
+  actions: Action[];
   initialScore: number;
   residualScore: number;
   needsAction: boolean;
 }
 
 export interface AssessmentDetail {
-  assessment: AssessmentRow;
-  centre: CentreRow | null;
-  assessor: ProfileRow | null;
-  signedOffBy: ProfileRow | null;
-  reviewedBy: ProfileRow | null;
+  assessment: Assessment;
+  centre: Centre | null;
+  assessor: AppProfile | null;
+  signedOffBy: AppProfile | null;
+  reviewedBy: AppProfile | null;
   templateName: string | null;
   findings: FindingDetail[];
-  revisions: RevisionRow[];
+  revisions: Revision[];
   headlineInitial: number;
   headlineResidual: number;
   openActions: number;
@@ -172,101 +146,89 @@ export interface AssessmentDetail {
 
 /** One assessment, fully hydrated — the document view and the PDF share this. */
 export const getAssessment = cache(
-  async (id: string): Promise<AssessmentDetail | null> => {
-    const supabase = await createClient();
+  (id: string): Promise<AssessmentDetail | null> =>
+    query(async (tx) => {
+      const assessment = await tx.assessment.findUnique({
+        where: { id },
+        include: {
+          centre: true,
+          assessor: true,
+          signedOffBy: true,
+          reviewedBy: true,
+          template: { select: { name: true } },
+          revisions: { orderBy: { revisionNo: "desc" } },
+          findings: {
+            orderBy: { sortOrder: "asc" },
+            include: {
+              hazard: { select: { label: true, category: true, guidance: true } },
+              actions: { orderBy: { dueAt: "asc" } },
+            },
+          },
+        },
+      });
+      if (!assessment) return null;
 
-    const { data: assessment } = await supabase
-      .from("assessment")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
-    if (!assessment) return null;
+      // Control labels come from one lookup rather than a join per finding:
+      // control_measure_ids is an array column, so there is no relation to
+      // traverse, and the union across findings is a handful of rows.
+      const controlIds = [
+        ...new Set(assessment.findings.flatMap((f) => f.controlMeasureIds)),
+      ];
+      const controls = controlIds.length
+        ? await tx.controlMeasure.findMany({
+            where: { id: { in: controlIds } },
+            select: { id: true, label: true },
+          })
+        : [];
+      const controlById = new Map(controls.map((c) => [c.id, c]));
 
-    const [
-      { data: findings },
-      { data: centre },
-      { data: profiles },
-      { data: revisions },
-      { data: template },
-      maps,
-    ] = await Promise.all([
-      supabase
-        .from("finding")
-        .select("*")
-        .eq("assessment_id", id)
-        .order("sort_order"),
-      supabase.from("centre").select("*").eq("id", assessment.centre_id).maybeSingle(),
-      supabase.from("profile").select("*"),
-      supabase
-        .from("revision")
-        .select("*")
-        .eq("assessment_id", id)
-        .order("revision_no", { ascending: false }),
-      assessment.template_id
-        ? supabase
-            .from("template")
-            .select("name")
-            .eq("id", assessment.template_id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      lookupMaps(),
-    ]);
+      const findings: FindingDetail[] = assessment.findings.map((f) => {
+        const residualScore = riskScore(f.residualLikelihood, f.residualSeverity);
+        return {
+          ...f,
+          hazardLabel: f.hazard.label,
+          hazardCategory: f.hazard.category,
+          hazardGuidance: f.hazard.guidance,
+          controls: f.controlMeasureIds
+            .map((cid) => controlById.get(cid))
+            .filter((c): c is NonNullable<typeof c> => Boolean(c)),
+          actions: f.actions,
+          initialScore: riskScore(f.likelihood, f.severity),
+          residualScore,
+          needsAction: needsAction(residualScore),
+        };
+      });
 
-    const findingIds = (findings ?? []).map((f) => f.id);
-    const { data: actions } = findingIds.length
-      ? await supabase
-          .from("action")
-          .select("*")
-          .in("finding_id", findingIds)
-          .order("due_at", { nullsFirst: false })
-      : { data: [] as ActionRow[] };
-
-    const actionsByFinding = new Map<string, ActionRow[]>();
-    for (const action of actions ?? []) {
-      const list = actionsByFinding.get(action.finding_id) ?? [];
-      list.push(action);
-      actionsByFinding.set(action.finding_id, list);
-    }
-
-    const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
-
-    const detail: FindingDetail[] = (findings ?? []).map((f) => {
-      const hazard = maps.hazardById.get(f.hazard_id);
-      const residualScore = riskScore(f.residual_likelihood, f.residual_severity);
       return {
-        ...f,
-        hazardLabel: hazard?.label ?? "Unknown hazard",
-        hazardCategory: hazard?.category ?? "Physical",
-        hazardGuidance: hazard?.guidance ?? null,
-        controls: f.control_measure_ids
-          .map((cid) => maps.controlById.get(cid))
-          .filter((c): c is NonNullable<typeof c> => Boolean(c))
-          .map((c) => ({ id: c.id, label: c.label })),
-        actions: actionsByFinding.get(f.id) ?? [],
-        initialScore: riskScore(f.likelihood, f.severity),
-        residualScore,
-        needsAction: needsAction(residualScore),
+        assessment,
+        centre: assessment.centre,
+        assessor: assessment.assessor,
+        signedOffBy: assessment.signedOffBy,
+        reviewedBy: assessment.reviewedBy,
+        templateName: assessment.template?.name ?? null,
+        findings,
+        revisions: assessment.revisions,
+        headlineInitial: headlineInitialScore(
+          findings.map((f) => ({ likelihood: f.likelihood, severity: f.severity })),
+        ),
+        headlineResidual: headlineResidualScore(
+          findings.map((f) => ({
+            residual_likelihood: f.residualLikelihood,
+            residual_severity: f.residualSeverity,
+          })),
+        ),
+        openActions: findings.reduce(
+          (n, f) => n + f.actions.filter((a) => !a.closedAt).length,
+          0,
+        ),
       };
-    });
+    }),
+);
 
-    return {
-      assessment,
-      centre: centre ?? null,
-      assessor: assessment.assessor_id
-        ? (profileById.get(assessment.assessor_id) ?? null)
-        : null,
-      signedOffBy: assessment.signed_off_by
-        ? (profileById.get(assessment.signed_off_by) ?? null)
-        : null,
-      reviewedBy: assessment.reviewed_by
-        ? (profileById.get(assessment.reviewed_by) ?? null)
-        : null,
-      templateName: template?.name ?? null,
-      findings: detail,
-      revisions: revisions ?? [],
-      headlineInitial: headlineInitialScore(detail),
-      headlineResidual: headlineResidualScore(detail),
-      openActions: (actions ?? []).filter((a) => !a.closed_at).length,
-    };
-  },
+/** Everyone who can own an action or sign something off. */
+export const listPeople = cache(
+  (): Promise<AppProfile[]> =>
+    query((tx) =>
+      tx.profile.findMany({ where: { isActive: true }, orderBy: { fullName: "asc" } }),
+    ),
 );

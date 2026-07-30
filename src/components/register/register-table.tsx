@@ -85,7 +85,7 @@ export function RegisterTable({
         accessorKey: "title",
         header: "Assessment",
         cell: ({ row }) => (
-          <span className="block max-w-[22rem] truncate font-medium text-ink">
+          <span className="block max-w-[18rem] truncate font-medium text-ink">
             {row.original.title}
           </span>
         ),
@@ -104,7 +104,9 @@ export function RegisterTable({
                   >
                     {row.original.centreCode}
                   </span>
-                  <span className="truncate text-ink-soft">{row.original.centreName}</span>
+                  <span className="max-w-[9rem] truncate text-ink-soft">
+                    {row.original.centreName}
+                  </span>
                 </span>
               ),
             } satisfies ColumnDef<RegisterRow>,
@@ -115,7 +117,9 @@ export function RegisterTable({
         accessorKey: "assessorName",
         header: "Assessor",
         cell: ({ row }) => (
-          <span className="truncate text-ink-soft">{row.original.assessorName}</span>
+          <span className="block max-w-[8rem] truncate text-ink-soft">
+            {row.original.assessorName}
+          </span>
         ),
       },
       {
@@ -284,7 +288,7 @@ export function RegisterTable({
                             ? "descending"
                             : "none"
                       }
-                      className="sticky top-0 z-20 border-b border-rule bg-surface-raised px-3 py-2 text-left align-bottom whitespace-nowrap"
+                      className="sticky top-0 z-20 border-b border-rule bg-surface-raised px-2.5 py-2 text-left align-bottom whitespace-nowrap"
                     >
                       <button
                         type="button"
@@ -327,14 +331,14 @@ export function RegisterTable({
                     <td
                       key={cell.id}
                       className={cn(
-                        "border-b border-rule px-3 py-2 align-middle",
+                        "border-b border-rule px-2.5 py-2 align-middle",
                         // Overdue is marked by a left edge-rule: visually
                         // distinct without being alarming, and it survives a
                         // greyscale printout.
                         cellIndex === 0 &&
                           (isOverdue
-                            ? "border-l-2 border-l-risk-5 pl-2.5"
-                            : "border-l-2 border-l-transparent pl-2.5"),
+                            ? "border-l-2 border-l-risk-5 pl-2"
+                            : "border-l-2 border-l-transparent pl-2"),
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

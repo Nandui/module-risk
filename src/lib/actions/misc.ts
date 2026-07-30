@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import type { Route } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { AuthError } from "next-auth";
+import { signIn as authSignIn, signOut as authSignOut } from "@/lib/auth";
+import { explainDbError, withUser } from "@/lib/db";
 import { requireSession, isHsLead, CENTRE_COOKIE } from "@/lib/data/session";
 import {
   actionSchema,
@@ -15,7 +17,9 @@ import {
 } from "@/lib/schemas";
 import type { ActionResult } from "@/lib/actions/assessments";
 
-function fieldErrorsFrom(issues: { path: (string | number | symbol)[]; message: string }[]) {
+function fieldErrorsFrom(
+  issues: { path: (string | number | symbol)[]; message: string }[],
+) {
   const fieldErrors: Record<string, string> = {};
   for (const issue of issues) {
     const key = issue.path.join(".") || "form";
@@ -55,43 +59,44 @@ export async function signIn(formData: FormData): Promise<ActionResult> {
     return { ok: false, fieldErrors: fieldErrorsFrom(parsed.error.issues) };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
-
-  if (error) {
-    // Deliberately does not distinguish "no such account" from "wrong
-    // password" — that difference is an account-enumeration leak.
-    return {
-      ok: false,
-      error: "That email and password do not match an account. Check both and try again.",
-    };
-  }
-
-  // Only same-origin paths are honoured — a `next` of `//evil.example` or a
-  // full URL is an open redirect, so anything that is not a plain path falls
-  // back to the register.
   const requested = String(formData.get("next") ?? "");
+  // Only same-origin paths are honoured — a `next` of `//evil.example` or a
+  // full URL is an open redirect.
   const safe =
     requested.startsWith("/") && !requested.startsWith("//") ? requested : "/register";
-  redirect(safe as Route);
+
+  try {
+    await authSignIn("credentials", { ...parsed.data, redirectTo: safe });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      // Deliberately does not distinguish "no such account" from "wrong
+      // password" — that difference is an account-enumeration leak.
+      return {
+        ok: false,
+        error: "That email and password do not match an account. Check both and try again.",
+      };
+    }
+    // NEXT_REDIRECT on success: Auth.js signals the redirect by throwing.
+    throw error;
+  }
+
+  return { ok: true };
 }
 
 export async function signOut(): Promise<void> {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/sign-in");
+  await authSignOut({ redirectTo: "/sign-in" as Route });
 }
 
 // ---- actions on findings ------------------------------------------
 
 export async function createAction(formData: FormData): Promise<ActionResult> {
-  await requireSession();
+  const session = await requireSession();
 
   const parsed = actionSchema.safeParse({
-    finding_id: formData.get("finding_id"),
+    findingId: formData.get("findingId"),
     description: formData.get("description"),
-    owner_id: formData.get("owner_id") || undefined,
-    due_at: formData.get("due_at"),
+    ownerId: formData.get("ownerId") || undefined,
+    dueAt: formData.get("dueAt"),
   });
   if (!parsed.success) {
     return {
@@ -101,17 +106,25 @@ export async function createAction(formData: FormData): Promise<ActionResult> {
     };
   }
 
-  const supabase = await createClient();
-  // centre_id is omitted on purpose: a BEFORE INSERT trigger fills it from
-  // the finding's assessment, so the caller can never set it wrong.
-  const { error } = await supabase.from("action").insert({
-    finding_id: parsed.data.finding_id,
-    description: parsed.data.description,
-    owner_id: parsed.data.owner_id ?? null,
-    due_at: new Date(parsed.data.due_at).toISOString(),
-  });
-
-  if (error) return { ok: false, error: error.message };
+  try {
+    // centreId is required by the schema but overwritten by a BEFORE INSERT
+    // trigger from the finding's assessment, so the caller can never set it
+    // wrong. The placeholder below never reaches storage.
+    await withUser(session.profile.id, (tx) =>
+      tx.$executeRaw`
+        insert into "action" ("id", "finding_id", "centre_id", "description", "owner_id", "due_at")
+        values (
+          gen_random_uuid(),
+          ${parsed.data.findingId}::uuid,
+          '00000000-0000-0000-0000-000000000000'::uuid,
+          ${parsed.data.description},
+          ${parsed.data.ownerId ?? null}::uuid,
+          ${new Date(parsed.data.dueAt)}
+        )`,
+    );
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
 
   revalidatePath("/actions");
   revalidatePath("/register");
@@ -123,23 +136,26 @@ export async function closeAction(formData: FormData): Promise<ActionResult> {
 
   const parsed = closeActionSchema.safeParse({
     id: formData.get("id"),
-    closure_note: formData.get("closure_note"),
+    closureNote: formData.get("closureNote"),
   });
   if (!parsed.success) {
     return { ok: false, fieldErrors: fieldErrorsFrom(parsed.error.issues) };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("action")
-    .update({
-      closed_at: new Date().toISOString(),
-      closed_by: session.profile.id,
-      closure_note: parsed.data.closure_note ?? null,
-    })
-    .eq("id", parsed.data.id);
-
-  if (error) return { ok: false, error: error.message };
+  try {
+    await withUser(session.profile.id, (tx) =>
+      tx.action.update({
+        where: { id: parsed.data.id },
+        data: {
+          closedAt: new Date(),
+          closedById: session.profile.id,
+          closureNote: parsed.data.closureNote ?? null,
+        },
+      }),
+    );
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
 
   revalidatePath("/actions");
   revalidatePath("/reports");
@@ -147,13 +163,19 @@ export async function closeAction(formData: FormData): Promise<ActionResult> {
 }
 
 export async function reopenAction(id: string): Promise<ActionResult> {
-  await requireSession();
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("action")
-    .update({ closed_at: null, closed_by: null, closure_note: null })
-    .eq("id", id);
-  if (error) return { ok: false, error: error.message };
+  const session = await requireSession();
+
+  try {
+    await withUser(session.profile.id, (tx) =>
+      tx.action.update({
+        where: { id },
+        data: { closedAt: null, closedById: null, closureNote: null },
+      }),
+    );
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
+
   revalidatePath("/actions");
   return { ok: true };
 }
@@ -180,33 +202,34 @@ export async function proposeHazard(formData: FormData): Promise<ActionResult> {
     };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("hazard")
-    .insert({
-      label: parsed.data.label,
-      category: parsed.data.category,
-      guidance: parsed.data.guidance,
-      // The H&S lead's own additions are approved on the spot; everyone
-      // else's wait for them.
-      review_state: isHsLead(session.profile) ? "approved" : "pending_review",
-      created_by: session.profile.id,
-    })
-    .select("id, label, review_state")
-    .single();
+  try {
+    const created = await withUser(session.profile.id, (tx) =>
+      tx.hazard.create({
+        data: {
+          label: parsed.data.label,
+          category: parsed.data.category,
+          guidance: parsed.data.guidance,
+          // The H&S lead's own additions are approved on the spot; everyone
+          // else's wait for them.
+          reviewState: isHsLead(session.profile) ? "approved" : "pending_review",
+          createdById: session.profile.id,
+        },
+        select: { id: true, label: true, reviewState: true },
+      }),
+    );
 
-  if (error) {
-    if (error.message.includes("hazard_label_category_key")) {
-      return {
-        ok: false,
-        error: "That hazard is already in the library under this category. Search for it instead.",
-      };
-    }
-    return { ok: false, error: error.message };
+    revalidatePath("/library");
+    return {
+      ok: true,
+      data: {
+        id: created.id,
+        label: created.label,
+        review_state: created.reviewState,
+      },
+    };
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
   }
-
-  revalidatePath("/library");
-  return { ok: true, data: { id: data.id, label: data.label, review_state: data.review_state } };
 }
 
 export async function proposeControlMeasure(formData: FormData): Promise<ActionResult> {
@@ -224,30 +247,31 @@ export async function proposeControlMeasure(formData: FormData): Promise<ActionR
     };
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("control_measure")
-    .insert({
-      label: parsed.data.label,
-      category: parsed.data.category,
-      review_state: isHsLead(session.profile) ? "approved" : "pending_review",
-      created_by: session.profile.id,
-    })
-    .select("id, label, review_state")
-    .single();
+  try {
+    const created = await withUser(session.profile.id, (tx) =>
+      tx.controlMeasure.create({
+        data: {
+          label: parsed.data.label,
+          category: parsed.data.category,
+          reviewState: isHsLead(session.profile) ? "approved" : "pending_review",
+          createdById: session.profile.id,
+        },
+        select: { id: true, label: true, reviewState: true },
+      }),
+    );
 
-  if (error) {
-    if (error.message.includes("control_measure_label_key")) {
-      return {
-        ok: false,
-        error: "That control is already in the library. Search for it instead.",
-      };
-    }
-    return { ok: false, error: error.message };
+    revalidatePath("/library");
+    return {
+      ok: true,
+      data: {
+        id: created.id,
+        label: created.label,
+        review_state: created.reviewState,
+      },
+    };
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
   }
-
-  revalidatePath("/library");
-  return { ok: true, data: { id: data.id, label: data.label, review_state: data.review_state } };
 }
 
 export async function reviewLibraryEntry(
@@ -260,12 +284,15 @@ export async function reviewLibraryEntry(
     return { ok: false, error: "Only the H&S lead can approve library additions." };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from(table)
-    .update({ review_state: decision })
-    .eq("id", id);
-  if (error) return { ok: false, error: error.message };
+  try {
+    await withUser(session.profile.id, (tx) =>
+      table === "hazard"
+        ? tx.hazard.update({ where: { id }, data: { reviewState: decision } })
+        : tx.controlMeasure.update({ where: { id }, data: { reviewState: decision } }),
+    );
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
 
   revalidatePath("/library");
   return { ok: true };

@@ -67,11 +67,11 @@ export function AppShell({
               aria-hidden
               className="grid size-7 shrink-0 place-items-center rounded-full bg-accent-wash font-mono text-data-xs text-accent-ink"
             >
-              {initials(session.profile.full_name)}
+              {initials(session.profile.fullName)}
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-ui-sm text-ink">
-                {session.profile.full_name}
+                {session.profile.fullName}
               </span>
               <span className="block truncate text-ui-sm text-faint">
                 {ROLE_META[session.profile.role].label}

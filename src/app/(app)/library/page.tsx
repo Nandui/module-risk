@@ -23,8 +23,8 @@ export default async function LibraryPage() {
   ]);
 
   const pending =
-    hazards.filter((h) => h.review_state === "pending_review").length +
-    controls.filter((c) => c.review_state === "pending_review").length;
+    hazards.filter((h) => h.reviewState === "pending_review").length +
+    controls.filter((c) => c.reviewState === "pending_review").length;
 
   return (
     <>

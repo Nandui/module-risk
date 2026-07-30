@@ -4,7 +4,8 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Check, Plus, Trash2 } from "lucide-react";
-import type { ControlMeasureRow, HazardRow, ProfileRow } from "@/lib/db/types";
+import type { ControlMeasure, Hazard } from "@prisma/client";
+import type { AppProfile } from "@/lib/db";
 import type { AssessmentDetail } from "@/lib/data/assessments";
 import { PERSONS_AT_RISK, CATEGORY_META, type HazardCategory, type PersonAtRisk } from "@/lib/vocab";
 import { bandMeta, riskScore, needsAction } from "@/lib/risk";
@@ -52,9 +53,9 @@ export function AuthoringFlow({
   canSignOff,
 }: {
   detail: AssessmentDetail;
-  hazards: HazardRow[];
-  controls: ControlMeasureRow[];
-  people: ProfileRow[];
+  hazards: Hazard[];
+  controls: ControlMeasure[];
+  people: AppProfile[];
   templateHazardIds: string[];
   canSignOff: boolean;
 }) {
@@ -65,16 +66,16 @@ export function AuthoringFlow({
     const existing: Draft[] = detail.findings.map((f) => ({
       id: f.id,
       key: f.id,
-      hazardId: f.hazard_id,
+      hazardId: f.hazardId,
       initial: { likelihood: f.likelihood, severity: f.severity },
       residual: {
-        likelihood: f.residual_likelihood,
-        severity: f.residual_severity,
+        likelihood: f.residualLikelihood,
+        severity: f.residualSeverity,
       },
-      controlIds: [...f.control_measure_ids],
-      persons: [...f.persons_at_risk],
+      controlIds: [...f.controlMeasureIds],
+      persons: [...f.personsAtRisk],
       notes: f.notes ?? "",
-      photoIds: [...f.photo_ids],
+      photoIds: [...f.photoIds],
     }));
 
     // The template walks the assessor through its hazards; any not yet
@@ -101,8 +102,8 @@ export function AuthoringFlow({
   } | null>(null);
 
   // Library additions made mid-flow appear immediately without a reload.
-  const [extraHazards, setExtraHazards] = React.useState<HazardRow[]>([]);
-  const [extraControls, setExtraControls] = React.useState<ControlMeasureRow[]>([]);
+  const [extraHazards, setExtraHazards] = React.useState<Hazard[]>([]);
+  const [extraControls, setExtraControls] = React.useState<ControlMeasure[]>([]);
 
   const allHazards = React.useMemo(
     () => [...hazards, ...extraHazards].sort((a, b) => a.label.localeCompare(b.label)),
@@ -152,16 +153,16 @@ export function AuthoringFlow({
 
       const result = await saveFinding({
         id: draft.id,
-        assessment_id: detail.assessment.id,
-        hazard_id: draft.hazardId,
+        assessmentId: detail.assessment.id,
+        hazardId: draft.hazardId,
         likelihood: draft.initial!.likelihood,
         severity: draft.initial!.severity,
-        control_measure_ids: draft.controlIds,
-        residual_likelihood: draft.residual!.likelihood,
-        residual_severity: draft.residual!.severity,
-        persons_at_risk: draft.persons,
+        controlMeasureIds: draft.controlIds,
+        residualLikelihood: draft.residual!.likelihood,
+        residualSeverity: draft.residual!.severity,
+        personsAtRisk: draft.persons,
         notes: draft.notes || undefined,
-        photo_ids: draft.photoIds,
+        photoIds: draft.photoIds,
       });
 
       inFlight.current = false;
@@ -489,7 +490,7 @@ export function AuthoringFlow({
               </p>
             </div>
             <PhotoCapture
-              centreId={detail.assessment.centre_id}
+              centreId={detail.assessment.centreId}
               assessmentId={detail.assessment.id}
               photoIds={current.photoIds}
               disabled={locked}
@@ -624,25 +625,25 @@ export function AuthoringFlow({
           onOpenChange={(open) => !open && setProposing(null)}
           onProposed={(entry) => {
             if (proposing.kind === "hazard") {
-              const row: HazardRow = {
+              const row: Hazard = {
                 id: entry.id,
                 label: entry.label,
                 category: category ?? "Physical",
                 guidance: null,
-                review_state: entry.pending ? "pending_review" : "approved",
-                created_by: null,
-                created_at: new Date().toISOString(),
+                reviewState: entry.pending ? "pending_review" : "approved",
+                createdById: null,
+                createdAt: new Date(),
               };
               setExtraHazards((prev) => [...prev, row]);
               update({ hazardId: entry.id });
             } else {
-              const row: ControlMeasureRow = {
+              const row: ControlMeasure = {
                 id: entry.id,
                 label: entry.label,
                 category: category ?? "Physical",
-                review_state: entry.pending ? "pending_review" : "approved",
-                created_by: null,
-                created_at: new Date().toISOString(),
+                reviewState: entry.pending ? "pending_review" : "approved",
+                createdById: null,
+                createdAt: new Date(),
               };
               setExtraControls((prev) => [...prev, row]);
               update({ controlIds: [...current.controlIds, entry.id] });

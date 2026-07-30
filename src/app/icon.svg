@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Risk register">
+  <!-- The tile matrix, reduced to four tiles and their grout. Legible at
+       16px, and unmistakably the same object as the matrix in the app. -->
+  <rect width="32" height="32" fill="#0B1417" />
+  <g>
+    <rect x="4"  y="4"  width="11" height="11" fill="#99ccac" />
+    <rect x="17" y="4"  width="11" height="11" fill="#af9745" />
+    <rect x="4"  y="17" width="11" height="11" fill="#9eb577" />
+    <rect x="17" y="17" width="11" height="11" fill="#b84e42" />
+  </g>
+</svg>

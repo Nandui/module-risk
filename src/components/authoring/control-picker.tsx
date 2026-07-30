@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Check, Plus, Search } from "lucide-react";
-import type { ControlMeasureRow } from "@/lib/db/types";
+import type { ControlMeasure } from "@prisma/client";
 import type { HazardCategory } from "@/lib/vocab";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +25,7 @@ export function ControlPicker({
   labelledBy,
   disabled,
 }: {
-  controls: ControlMeasureRow[];
+  controls: ControlMeasure[];
   selected: string[];
   onChange: (ids: string[]) => void;
   category: HazardCategory | null;

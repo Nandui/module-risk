@@ -71,16 +71,16 @@ export function AssessmentDocument({
           ) : null}
         </div>
 
-        {assessment.scope_note ? (
+        {assessment.scopeNote ? (
           <p className="text-ui-lg leading-relaxed text-ink-soft">
-            {assessment.scope_note}
+            {assessment.scopeNote}
           </p>
         ) : null}
 
         <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-y border-rule py-4 sm:grid-cols-4">
           <Meta label="Reference">{assessment.reference}</Meta>
           <Meta label="Assessor" mono={false}>
-            {detail.assessor?.full_name ?? "Unassigned"}
+            {detail.assessor?.fullName ?? "Unassigned"}
           </Meta>
           <Meta label="Status" mono={false}>
             <span
@@ -93,17 +93,17 @@ export function AssessmentDocument({
             </span>
           </Meta>
           <Meta label="Review due">
-            {formatDate(assessment.review_due_at)}
+            {formatDate(assessment.reviewDueAt)}
             <span
               className={cn(
                 "mt-0.5 block font-sans text-ui-sm",
-                detail.assessment.review_due_at &&
-                  new Date(detail.assessment.review_due_at) < new Date()
+                detail.assessment.reviewDueAt &&
+                  new Date(detail.assessment.reviewDueAt) < new Date()
                   ? "text-risk-5-ink"
                   : "text-faint",
               )}
             >
-              {reviewLabel(assessment.review_due_at)}
+              {reviewLabel(assessment.reviewDueAt)}
             </span>
           </Meta>
         </dl>
@@ -154,15 +154,15 @@ export function AssessmentDocument({
           ) : null}
         </div>
 
-        {assessment.signed_off_at ? (
+        {assessment.signedOffAt ? (
           <p className="border-l-2 border-ink bg-surface-sunk px-3 py-2 text-ui-sm text-ink-soft print-keep">
             Signed off by{" "}
             <strong className="font-medium text-ink">
-              {detail.signedOffBy?.full_name ?? "a centre manager"}
+              {detail.signedOffBy?.fullName ?? "a centre manager"}
             </strong>{" "}
             on{" "}
             <span className="font-mono text-data-xs">
-              {formatDateTime(assessment.signed_off_at)}
+              {formatDateTime(assessment.signedOffAt)}
             </span>
             . This record cannot be edited — a correction creates a new revision.
           </p>
@@ -207,8 +207,8 @@ export function AssessmentDocument({
                     <RiskDelta
                       likelihood={finding.likelihood}
                       severity={finding.severity}
-                      residualLikelihood={finding.residual_likelihood}
-                      residualSeverity={finding.residual_severity}
+                      residualLikelihood={finding.residualLikelihood}
+                      residualSeverity={finding.residualSeverity}
                     />
                   </div>
                 </div>
@@ -218,8 +218,8 @@ export function AssessmentDocument({
                     <div>
                       <dt className="eyebrow">Who is at risk</dt>
                       <dd className="mt-1 text-ink-soft">
-                        {finding.persons_at_risk.length > 0
-                          ? sentenceList(finding.persons_at_risk)
+                        {finding.personsAtRisk.length > 0
+                          ? sentenceList(finding.personsAtRisk)
                           : "Not recorded"}
                       </dd>
                     </div>
@@ -265,8 +265,8 @@ export function AssessmentDocument({
                           {SEVERITY_LABELS[finding.severity - 1]})
                         </span>
                         <br />
-                        Residual {finding.residual_likelihood}×
-                        {finding.residual_severity} = {finding.residualScore}{" "}
+                        Residual {finding.residualLikelihood}×
+                        {finding.residualSeverity} = {finding.residualScore}{" "}
                         <span className="text-faint">
                           ({bandMeta(finding.residualScore).label})
                         </span>
@@ -277,8 +277,8 @@ export function AssessmentDocument({
                   <div className="shrink-0 print-keep">
                     <TileMatrixStatic
                       value={{
-                        likelihood: finding.residual_likelihood,
-                        severity: finding.residual_severity,
+                        likelihood: finding.residualLikelihood,
+                        severity: finding.residualSeverity,
                       }}
                     />
                   </div>
@@ -293,15 +293,15 @@ export function AssessmentDocument({
                           <span
                             className={cn(
                               "text-ink-soft",
-                              action.closed_at && "line-through decoration-faint",
+                              action.closedAt && "line-through decoration-faint",
                             )}
                           >
                             {action.description}
                           </span>
                           <span className="ml-2 font-mono text-data-xs text-muted">
-                            {action.closed_at
-                              ? `closed ${formatDate(action.closed_at)}`
-                              : `due ${formatDate(action.due_at)}`}
+                            {action.closedAt
+                              ? `closed ${formatDate(action.closedAt)}`
+                              : `due ${formatDate(action.dueAt)}`}
                           </span>
                         </li>
                       ))}

@@ -14,8 +14,7 @@ controlled library rows, because prose cannot be compared across centres and
 cross-centre comparison is the entire value of this product to a group.
 
 See [`docs/design-plan.md`](docs/design-plan.md) for the palette, type scale,
-layout and signature element, and for the two places this deliberately departs
-from the brief.
+layout and signature element, and for the places this departs from the brief.
 
 ---
 
@@ -33,93 +32,138 @@ Every screen serves one of them, and density is split accordingly.
 
 Next.js 16 (App Router, TypeScript strict) · Tailwind CSS v4, CSS-first `@theme`
 · shadcn/ui primitives · React Hook Form + Zod · TanStack Table · Motion ·
-Recharts · Supabase (Postgres, Auth, Storage, RLS from day one) · Server Actions
-for every mutation · server-side PDF via headless Chromium · Vercel.
+Recharts · **Postgres with Prisma 6** · **Auth.js v5** · **Vercel Blob** for
+photo evidence · Server Actions for every mutation · server-side PDF via
+headless Chromium · Vercel.
+
+The same stack as the `centrely` suite, so a developer moves between the two
+apps without relearning anything.
 
 No state-management library, no CSS-in-JS, no REST or tRPC layer, and
 `window.print()` is not used anywhere.
 
 ## Getting started
 
+### Locally, with no Docker
+
 ```bash
 npm install
-cp .env.example .env.local     # fill in your Supabase URL and anon key
+npm run db:local      # downloads Postgres, migrates, seeds, writes .env
 ```
 
-Then apply the schema. With the Supabase CLI and Docker:
-
-```bash
-supabase start
-supabase db reset              # runs migrations, then supabase/seed.sql
-```
-
-Against a hosted project, run the files in order in the SQL editor:
-
-1. `supabase/migrations/20260730090000_schema.sql` — tables, constraints, triggers
-2. `supabase/migrations/20260730090100_rls.sql` — row level security
-3. `supabase/migrations/20260730090200_storage.sql` — the private evidence bucket
-4. `supabase/seed.sql` — libraries, templates and a plausible group
-
-The seed's first block creates three demo sign-ins (password
-`risk-demo-1234`) so the app is usable immediately:
-
-| Email | Role | Can |
-| --- | --- | --- |
-| `lead@example.com` | H&S lead | Everything, including approving library additions |
-| `manager@example.com` | Centre manager | Sign off and revise assessments |
-| `assessor@example.com` | Assessor | Author assessments, send for review |
-
-**Delete that block before seeding a production project.**
+Leave that running — Postgres is a child of it, the way you would leave
+`docker compose up` running. Then in another terminal:
 
 ```bash
 npm run dev
 ```
 
-## Verification
+Sign in as `lead@example.com` / `risk-demo-1234`.
 
-Three harnesses, all runnable without a Supabase project:
+### Against a managed Postgres
+
+Neon, Vercel Postgres, or anything else that speaks Postgres 14+.
 
 ```bash
-npm run verify:sql      # migrations + seed against a real Postgres
-npm run verify:risk     # invariants of the risk engine
+cp .env.example .env      # fill in the connection strings, see below
+npm run db:deploy         # prisma migrate deploy
+npm run db:seed
+```
+
+## Two connection strings, and why
+
+```
+DATABASE_URL      the OWNER role — migrations and seed only
+APP_DATABASE_URL  the module_risk_app role — what the app runs on
+```
+
+**Row level security does not apply to a table's owner.** Running the app on the
+migration connection would silently disable every policy in the database, so the
+app must connect as the least-privilege role instead. `src/lib/db.ts` throws in
+production if `APP_DATABASE_URL` is missing, and warns loudly in development,
+because a silent downgrade here is the exact failure this setup exists to
+prevent.
+
+The second migration creates the role. Give it a password once:
+
+```sql
+ALTER ROLE module_risk_app WITH PASSWORD 'a-long-random-string';
+```
+
+It has DML on every table and nothing else — no DDL, no `TRUNCATE`, and no
+`SELECT` on `profile.password_hash`. Sign-in reads the hash through a
+`SECURITY DEFINER` function, so an ordinary query cannot leak it even by
+accident. Prisma is configured with `omit: { profile: { passwordHash: true } }`
+to match; without it, Prisma's default "return every scalar field" makes
+`profile.findUnique()` fail outright.
+
+### How the app identifies itself to the policies
+
+Every query goes through `withUser(userId, fn)`, which opens a transaction and
+sets a transaction-local session variable:
+
+```sql
+select set_config('app.user_id', $1, true)
+```
+
+The policies read it via `app_uid()`. Transaction-local matters: the identity
+cannot leak to the next request that borrows the same pooled connection. A
+connection that never identifies itself reads nothing at all, rather than
+reading everything.
+
+## Verification
+
+Three harnesses. None of them needs a hosted database.
+
+```bash
+npm run verify        # all three
+npm run verify:db     # migrations, seed, append-only guards, RLS behaviour
+npm run verify:risk   # 38 invariants of the risk engine
 npm run typecheck
 ```
 
-`verify:sql` downloads and starts a throwaway Postgres, stubs the handful of
-Supabase `auth` and `storage` objects the migrations touch, runs every migration
-and the seed, then asserts the append-only guarantees actually hold — that a
-signed-off assessment refuses edits, that a revision cannot be rewritten, and
-that a residual score above its initial is rejected. It checks SQL correctness,
-not RLS behaviour, which needs real JWT roles.
+`verify:db` starts a throwaway Postgres, applies the migrations, runs the seed,
+then connects **as the app role** and asserts what each role can and cannot do:
+that an assessor can edit their own draft but not a signed-off record, that they
+cannot create a centre or self-approve a library addition, that a revision
+cannot be attributed to someone else, that the app role can neither read a
+password hash nor drop a table, and that an unidentified connection reads
+nothing.
+
+Those RLS assertions were impossible to write on Supabase, where identity comes
+from a signed JWT. Moving to a session variable made the policies testable, which
+is the main engineering benefit of the change.
 
 `verify:risk` covers scoring, banding, the escalation threshold, matrix layout
 and the initial → residual arithmetic. It exists because the engine once shipped
-with `bandMeta` guessing whether its argument was a score or a band, which
-reported every residual of 5 as "Very high" instead of "Low" — a mistake with no
-signature a type checker could catch.
+with `bandMeta` guessing whether its argument was a score or a band, reporting
+every residual of 5 as "Very high" instead of "Low" — a mistake with no signature
+a type checker could catch.
+
+### Driving the real app
+
+```bash
+node scripts/drive-app.mjs ./shots
+```
+
+Signs in with a real browser, walks every screen, screenshots each one, and fails
+on any console or page error. This is the check that Auth.js, Prisma, RLS and the
+Server Actions work *together*, not just that they compile.
 
 ### Design reference
 
-In development only, two routes render the design system and the screens
-without needing a database:
+Development only — these routes 404 in production:
 
 - `/preview` — tokens, the type scale, and the tile matrix in isolation
-- `/preview/screens` — register, assessment document and actions list on
-  synthetic data, so density can be judged
+- `/preview/screens` — register, document and actions on synthetic data
 - `/preview/print` — the print variant, for exercising the PDF pipeline
-
-```bash
-node scripts/screenshot.mjs ./shots register=/preview/screens
-```
-
-Both `/preview` routes return 404 outside development.
 
 ## Data model
 
 ```
 centre           id, name, code, address
 centre_member    which centres a person works across
-profile          one row per auth user; role: assessor | manager | hs_lead
+profile          identity, role (assessor | manager | hs_lead), password hash
 template         id, name, category, hazard_ids[]      -- e.g. "Pool plant room"
 hazard           id, label, category, guidance         -- library, controlled
 control_measure  id, label, category                   -- library, controlled
@@ -168,12 +212,29 @@ threshold the source module used.
 Both the initial and the residual score are stored. The delta is the most
 persuasive number in any report and cannot be recomputed from the controls.
 
-## Deploying
+## Deploying to Vercel
 
-Vercel, with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` set.
+Environment variables:
 
-PDF generation runs headless Chromium in a Node runtime function with
-`maxDuration = 60`. In production it uses `@sparticuz/chromium`; locally it
-picks up a system Chromium, or whatever `CHROMIUM_EXECUTABLE_PATH` points at.
+| Variable | Notes |
+| --- | --- |
+| `DATABASE_URL` | Owner role. Used by `prisma migrate deploy` in the build. |
+| `DIRECT_URL` | Direct (unpooled) host — Prisma migrate needs it. |
+| `APP_DATABASE_URL` | The `module_risk_app` role. What the running app uses. |
+| `AUTH_SECRET` | `openssl rand -base64 32` |
+| `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect |
+
+`vercel.json` runs `prisma generate && prisma migrate deploy && next build`, and
+gives the two PDF routes 2 GB and 60 seconds — they run headless Chromium via
+`@sparticuz/chromium`. Locally the PDF renderer picks up a system Chromium, or
+whatever `CHROMIUM_EXECUTABLE_PATH` points at.
+
 The PDF routes render real app routes and forward the caller's own cookies, so a
 PDF can never contain more than the person requesting it is allowed to see.
+
+### Before production
+
+- Remove or change the demo accounts in `prisma/seed.ts`. They all share one
+  password.
+- Set a real password on `module_risk_app` and point `APP_DATABASE_URL` at it.
+- `AUTH_SECRET` must not be the development placeholder.

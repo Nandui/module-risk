@@ -11,3 +11,7 @@ build
 next-env.d.ts
 
 .vercel
+
+# Local Postgres data (scripts/dev-db.mjs keeps it in the temp dir by
+# default, but honour DEV_DB_DIR pointing here).
+/.devdb

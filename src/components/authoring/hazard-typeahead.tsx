@@ -4,7 +4,7 @@ import * as React from "react";
 import { Command } from "cmdk";
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronsUpDown, Plus } from "lucide-react";
-import type { HazardRow } from "@/lib/db/types";
+import type { Hazard } from "@prisma/client";
 import { CATEGORY_META } from "@/lib/vocab";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,7 @@ export function HazardTypeahead({
   id,
   disabled,
 }: {
-  hazards: HazardRow[];
+  hazards: Hazard[];
   value: string | null;
   onChange: (hazardId: string) => void;
   onProposeNew: (query: string) => void;
@@ -113,7 +113,7 @@ export function HazardTypeahead({
                         {used ? "already added" : hazard.category}
                       </span>
                     </span>
-                    {hazard.review_state === "pending_review" ? (
+                    {hazard.reviewState === "pending_review" ? (
                       <span className="text-ui-sm text-accent-ink">
                         Awaiting review by the H&amp;S lead
                       </span>

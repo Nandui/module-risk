@@ -119,7 +119,7 @@ export default async function PrintReportPage() {
       {/* ---- cross-centre comparison -------------------------------- */}
       <section className="mb-8">
         <h2 className="eyebrow mb-2">Cross-centre comparison</h2>
-        <ComparisonTable centres={data.centres} />
+        <ComparisonTable centres={data.centres} variant="print" />
       </section>
 
       {/* ---- where risk sits ---------------------------------------- */}
@@ -144,7 +144,7 @@ export default async function PrintReportPage() {
               const meta = BAND_META[band as 1 | 2 | 3 | 4 | 5];
               return (
                 <div key={band} className="flex items-baseline gap-2">
-                  <dt className="w-24 shrink-0 text-ink-soft">
+                  <dt className="w-32 shrink-0 whitespace-nowrap text-ink-soft">
                     Band {band} — {meta.label}
                   </dt>
                   <dd className="font-mono text-data-xs text-muted">{meta.range}</dd>

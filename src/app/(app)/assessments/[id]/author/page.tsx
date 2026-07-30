@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import { canSignOff, requireSession } from "@/lib/data/session";
-import { getAssessment } from "@/lib/data/assessments";
+import { getAssessment, listPeople } from "@/lib/data/assessments";
 import { listControlMeasures, listHazards, listTemplates } from "@/lib/data/library";
 import { AuthoringFlow } from "@/components/authoring/authoring-flow";
 import { Button } from "@/components/ui/button";
@@ -18,20 +17,18 @@ export default async function AuthorPage({
 }) {
   const [{ id }, session] = await Promise.all([params, requireSession()]);
 
-  const [detail, hazards, controls, templates] = await Promise.all([
+  const [detail, hazards, controls, templates, people] = await Promise.all([
     getAssessment(id),
     listHazards(),
     listControlMeasures(),
     listTemplates(),
+    listPeople(),
   ]);
 
   if (!detail) notFound();
 
-  const supabase = await createClient();
-  const { data: people } = await supabase.from("profile").select("*").order("full_name");
-
-  const template = detail.assessment.template_id
-    ? templates.find((t) => t.id === detail.assessment.template_id)
+  const template = detail.assessment.templateId
+    ? templates.find((t) => t.id === detail.assessment.templateId)
     : undefined;
 
   return (
@@ -60,8 +57,8 @@ export default async function AuthorPage({
         detail={detail}
         hazards={hazards}
         controls={controls}
-        people={people ?? []}
-        templateHazardIds={template?.hazard_ids ?? []}
+        people={people}
+        templateHazardIds={template?.hazardIds ?? []}
         canSignOff={canSignOff(session.profile)}
       />
     </>

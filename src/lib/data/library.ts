@@ -1,6 +1,6 @@
 import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
-import type { ControlMeasureRow, HazardRow, TemplateRow } from "@/lib/db/types";
+import type { ControlMeasure, Hazard, Template } from "@prisma/client";
+import { query } from "@/lib/data/session";
 
 /**
  * The controlled libraries. Read on nearly every screen, so each is cached
@@ -8,49 +8,47 @@ import type { ControlMeasureRow, HazardRow, TemplateRow } from "@/lib/db/types";
  * round trips it would take to page them.
  */
 
-export const listHazards = cache(async (): Promise<HazardRow[]> => {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("hazard")
-    .select("*")
-    .neq("review_state", "rejected")
-    .order("label");
-  return data ?? [];
-});
+export const listHazards = cache(
+  (): Promise<Hazard[]> =>
+    query((tx) =>
+      tx.hazard.findMany({
+        where: { reviewState: { not: "rejected" } },
+        orderBy: { label: "asc" },
+      }),
+    ),
+);
 
-export const listControlMeasures = cache(async (): Promise<ControlMeasureRow[]> => {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("control_measure")
-    .select("*")
-    .neq("review_state", "rejected")
-    .order("label");
-  return data ?? [];
-});
+export const listControlMeasures = cache(
+  (): Promise<ControlMeasure[]> =>
+    query((tx) =>
+      tx.controlMeasure.findMany({
+        where: { reviewState: { not: "rejected" } },
+        orderBy: { label: "asc" },
+      }),
+    ),
+);
 
-export const listTemplates = cache(async (): Promise<TemplateRow[]> => {
-  const supabase = await createClient();
-  const { data } = await supabase.from("template").select("*").order("name");
-  return data ?? [];
-});
+export const listTemplates = cache(
+  (): Promise<Template[]> =>
+    query((tx) => tx.template.findMany({ orderBy: { name: "asc" } })),
+);
 
 /** Entries proposed mid-walk, waiting on the H&S lead. */
-export const listPendingLibraryEntries = cache(async () => {
-  const supabase = await createClient();
-  const [{ data: hazards }, { data: controls }] = await Promise.all([
-    supabase
-      .from("hazard")
-      .select("*")
-      .eq("review_state", "pending_review")
-      .order("created_at"),
-    supabase
-      .from("control_measure")
-      .select("*")
-      .eq("review_state", "pending_review")
-      .order("created_at"),
-  ]);
-  return { hazards: hazards ?? [], controls: controls ?? [] };
-});
+export const listPendingLibraryEntries = cache(() =>
+  query(async (tx) => {
+    const [hazards, controls] = await Promise.all([
+      tx.hazard.findMany({
+        where: { reviewState: "pending_review" },
+        orderBy: { createdAt: "asc" },
+      }),
+      tx.controlMeasure.findMany({
+        where: { reviewState: "pending_review" },
+        orderBy: { createdAt: "asc" },
+      }),
+    ]);
+    return { hazards, controls };
+  }),
+);
 
 export async function lookupMaps() {
   const [hazards, controls] = await Promise.all([listHazards(), listControlMeasures()]);

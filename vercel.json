@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "prisma generate && prisma migrate deploy && next build",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/assessments/[id]/pdf/route.ts": {
+      "memory": 2048,
+      "maxDuration": 60
+    },
+    "src/app/api/reports/pdf/route.ts": {
+      "memory": 2048,
+      "maxDuration": 60
+    }
+  }
+}

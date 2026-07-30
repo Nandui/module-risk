@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import * as Popover from "@radix-ui/react-popover";
 import { Check, ChevronsUpDown, Waves } from "lucide-react";
-import type { CentreRow } from "@/lib/db/types";
+import type { Centre } from "@prisma/client";
 import { setCentre } from "@/lib/actions/misc";
 import { ALL_CENTRES } from "@/lib/centre";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,7 @@ export function CentreSwitcher({
   centres,
   centreId,
 }: {
-  centres: CentreRow[];
+  centres: Centre[];
   centreId: string | null;
 }) {
   const [open, setOpen] = React.useState(false);

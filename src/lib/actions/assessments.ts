@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import type { Prisma } from "@prisma/client";
+import { explainDbError, withUser, type Tx } from "@/lib/db";
 import { requireSession, canSignOff } from "@/lib/data/session";
 import {
   assessmentSchema,
@@ -11,7 +12,6 @@ import {
   revisionSchema,
   signOffSchema,
 } from "@/lib/schemas";
-import { getAssessment } from "@/lib/data/assessments";
 
 export interface ActionResult {
   ok: boolean;
@@ -35,61 +35,43 @@ function fromZod(error: z.ZodError): ActionResult {
   };
 }
 
-/**
- * Postgres errors are translated rather than surfaced. A constraint name is
- * not an error message an assessor can act on.
- */
-function fromPostgres(message: string): string {
-  if (message.includes("signed off")) {
-    return "This assessment is signed off, so it can no longer be edited. Create a revision to record a correction.";
-  }
-  if (message.includes("residual_not_worse")) {
-    return "Residual risk cannot be higher than the initial risk. Check the two matrix selections.";
-  }
-  if (message.includes("finding_assessment_id_hazard_id_key")) {
-    return "That hazard is already on this assessment. Edit the existing finding instead of adding it twice.";
-  }
-  if (message.includes("row-level security") || message.includes("permission")) {
-    return "You do not have permission to change this. Ask a centre manager or the H&S lead.";
-  }
-  return message;
-}
-
 // ---- create -------------------------------------------------------
 
 export async function createAssessment(formData: FormData): Promise<ActionResult> {
   const session = await requireSession();
 
   const parsed = assessmentSchema.safeParse({
-    centre_id: formData.get("centre_id"),
-    template_id: formData.get("template_id") || undefined,
+    centreId: formData.get("centreId"),
+    templateId: formData.get("templateId") || undefined,
     title: formData.get("title"),
-    scope_note: formData.get("scope_note"),
-    review_frequency_months: formData.get("review_frequency_months"),
+    scopeNote: formData.get("scopeNote"),
+    reviewFrequencyMonths: formData.get("reviewFrequencyMonths"),
   });
   if (!parsed.success) return fromZod(parsed.error);
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("assessment")
-    .insert({
-      centre_id: parsed.data.centre_id,
-      template_id: parsed.data.template_id ?? null,
-      title: parsed.data.title,
-      scope_note: parsed.data.scope_note ?? null,
-      review_frequency_months: parsed.data.review_frequency_months,
-      status: "draft",
-      assessor_id: session.profile.id,
-    })
-    .select("id")
-    .single();
-
-  if (error || !data) {
-    return { ok: false, error: fromPostgres(error?.message ?? "The assessment could not be created.") };
+  let id: string;
+  try {
+    const created = await withUser(session.profile.id, (tx) =>
+      tx.assessment.create({
+        data: {
+          centreId: parsed.data.centreId,
+          templateId: parsed.data.templateId ?? null,
+          title: parsed.data.title,
+          scopeNote: parsed.data.scopeNote ?? null,
+          reviewFrequencyMonths: parsed.data.reviewFrequencyMonths,
+          status: "draft",
+          assessorId: session.profile.id,
+        },
+        select: { id: true },
+      }),
+    );
+    id = created.id;
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
   }
 
   revalidatePath("/register");
-  redirect(`/assessments/${data.id}/author`);
+  redirect(`/assessments/${id}/author`);
 }
 
 // ---- findings — autosaved, one at a time --------------------------
@@ -100,49 +82,52 @@ export async function createAssessment(formData: FormData): Promise<ActionResult
  * saved row's id for the client to hold on to.
  */
 export async function saveFinding(input: unknown): Promise<ActionResult> {
-  await requireSession();
+  const session = await requireSession();
 
   const parsed = findingSchema.safeParse(input);
   if (!parsed.success) return fromZod(parsed.error);
 
   const { id, ...values } = parsed.data;
-  const supabase = await createClient();
 
   const payload = {
-    assessment_id: values.assessment_id,
-    hazard_id: values.hazard_id,
+    assessmentId: values.assessmentId,
+    hazardId: values.hazardId,
     likelihood: values.likelihood,
     severity: values.severity,
-    control_measure_ids: values.control_measure_ids,
-    residual_likelihood: values.residual_likelihood,
-    residual_severity: values.residual_severity,
-    persons_at_risk: values.persons_at_risk,
+    controlMeasureIds: values.controlMeasureIds,
+    residualLikelihood: values.residualLikelihood,
+    residualSeverity: values.residualSeverity,
+    personsAtRisk: values.personsAtRisk,
     notes: values.notes ?? null,
-    photo_ids: values.photo_ids,
-  };
+    photoIds: values.photoIds,
+  } satisfies Prisma.FindingUncheckedCreateInput;
 
-  const { data, error } = id
-    ? await supabase.from("finding").update(payload).eq("id", id).select("id").single()
-    : await supabase.from("finding").insert(payload).select("id").single();
+  try {
+    const saved = await withUser(session.profile.id, (tx) =>
+      id
+        ? tx.finding.update({ where: { id }, data: payload, select: { id: true } })
+        : tx.finding.create({ data: payload, select: { id: true } }),
+    );
 
-  if (error || !data) {
-    return {
-      ok: false,
-      error: fromPostgres(error?.message ?? "The finding could not be saved."),
-    };
+    revalidatePath(`/assessments/${values.assessmentId}/author`);
+    revalidatePath("/register");
+    return { ok: true, data: { id: saved.id } };
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
   }
-
-  revalidatePath(`/assessments/${values.assessment_id}/author`);
-  revalidatePath("/register");
-  return { ok: true, data: { id: data.id } };
 }
 
-export async function deleteFinding(id: string, assessmentId: string): Promise<ActionResult> {
-  await requireSession();
-  const supabase = await createClient();
+export async function deleteFinding(
+  id: string,
+  assessmentId: string,
+): Promise<ActionResult> {
+  const session = await requireSession();
 
-  const { error } = await supabase.from("finding").delete().eq("id", id);
-  if (error) return { ok: false, error: fromPostgres(error.message) };
+  try {
+    await withUser(session.profile.id, (tx) => tx.finding.delete({ where: { id } }));
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
 
   revalidatePath(`/assessments/${assessmentId}/author`);
   revalidatePath("/register");
@@ -152,23 +137,24 @@ export async function deleteFinding(id: string, assessmentId: string): Promise<A
 // ---- status -------------------------------------------------------
 
 export async function submitForReview(id: string): Promise<ActionResult> {
-  await requireSession();
-  const supabase = await createClient();
+  const session = await requireSession();
 
-  const detail = await getAssessment(id);
-  if (!detail) return { ok: false, error: "That assessment could not be found." };
-  if (detail.findings.length === 0) {
-    return {
-      ok: false,
-      error: "Add at least one finding before sending this for review.",
-    };
+  try {
+    const result = await withUser(session.profile.id, async (tx) => {
+      const findings = await tx.finding.count({ where: { assessmentId: id } });
+      if (findings === 0) {
+        return {
+          ok: false,
+          error: "Add at least one finding before sending this for review.",
+        } satisfies ActionResult;
+      }
+      await tx.assessment.update({ where: { id }, data: { status: "in_review" } });
+      return { ok: true } satisfies ActionResult;
+    });
+    if (!result.ok) return result;
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
   }
-
-  const { error } = await supabase
-    .from("assessment")
-    .update({ status: "in_review" })
-    .eq("id", id);
-  if (error) return { ok: false, error: fromPostgres(error.message) };
 
   revalidatePath("/register");
   revalidatePath(`/assessments/${id}/author`);
@@ -195,49 +181,61 @@ export async function signOffAssessment(input: unknown): Promise<ActionResult> {
     };
   }
 
-  const detail = await getAssessment(parsed.data.id);
-  if (!detail) return { ok: false, error: "That assessment could not be found." };
-  if (detail.findings.length === 0) {
-    return { ok: false, error: "An assessment with no findings cannot be signed off." };
+  const { id } = parsed.data;
+
+  try {
+    const result = await withUser(session.profile.id, async (tx) => {
+      const findings = await tx.finding.count({ where: { assessmentId: id } });
+      if (findings === 0) {
+        return {
+          ok: false,
+          error: "An assessment with no findings cannot be signed off.",
+        } satisfies ActionResult;
+      }
+
+      await tx.assessment.update({
+        where: { id },
+        data: {
+          status: "signed_off",
+          signedOffAt: new Date(),
+          signedOffById: session.profile.id,
+          reviewedById: session.profile.id,
+        },
+      });
+
+      // The snapshot is written inside the same transaction, after sign-off,
+      // so it captures the signed state and cannot be orphaned by a failure
+      // between the two writes.
+      await writeRevisionSnapshot(tx, id, "Signed off", session.profile.id);
+      return { ok: true } satisfies ActionResult;
+    });
+    if (!result.ok) return result;
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
   }
-
-  const supabase = await createClient();
-  const now = new Date().toISOString();
-
-  const { error } = await supabase
-    .from("assessment")
-    .update({
-      status: "signed_off",
-      signed_off_at: now,
-      signed_off_by: session.profile.id,
-      reviewed_by: session.profile.id,
-    })
-    .eq("id", parsed.data.id);
-
-  if (error) return { ok: false, error: fromPostgres(error.message) };
-
-  // The snapshot is written after sign-off so it captures the signed state —
-  // this is the record an inspector is shown.
-  await writeRevisionSnapshot(parsed.data.id, "Signed off", session.profile.id);
 
   revalidatePath("/register");
   revalidatePath("/reports");
-  revalidatePath(`/assessments/${parsed.data.id}/author`);
+  revalidatePath(`/assessments/${id}/author`);
   return { ok: true };
 }
 
 export async function archiveAssessment(id: string): Promise<ActionResult> {
   const session = await requireSession();
   if (!canSignOff(session.profile)) {
-    return { ok: false, error: "Only a centre manager or the H&S lead can archive an assessment." };
+    return {
+      ok: false,
+      error: "Only a centre manager or the H&S lead can archive an assessment.",
+    };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("assessment")
-    .update({ status: "archived" })
-    .eq("id", id);
-  if (error) return { ok: false, error: fromPostgres(error.message) };
+  try {
+    await withUser(session.profile.id, (tx) =>
+      tx.assessment.update({ where: { id }, data: { status: "archived" } }),
+    );
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
 
   revalidatePath("/register");
   return { ok: true };
@@ -253,7 +251,7 @@ export async function createRevision(formData: FormData): Promise<ActionResult> 
   const session = await requireSession();
 
   const parsed = revisionSchema.safeParse({
-    assessment_id: formData.get("assessment_id"),
+    assessmentId: formData.get("assessmentId"),
     reason: formData.get("reason"),
   });
   if (!parsed.success) return fromZod(parsed.error);
@@ -265,58 +263,57 @@ export async function createRevision(formData: FormData): Promise<ActionResult> 
     };
   }
 
-  const written = await writeRevisionSnapshot(
-    parsed.data.assessment_id,
-    parsed.data.reason,
-    session.profile.id,
-  );
-  if (!written.ok) return written;
+  const { assessmentId, reason } = parsed.data;
 
-  // Reopening clears the signature: the reopened document is not the record
-  // that was signed. The snapshot above is.
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("assessment")
-    .update({ status: "draft", signed_off_at: null, signed_off_by: null })
-    .eq("id", parsed.data.assessment_id);
-
-  if (error) return { ok: false, error: fromPostgres(error.message) };
+  try {
+    await withUser(session.profile.id, async (tx) => {
+      await writeRevisionSnapshot(tx, assessmentId, reason, session.profile.id);
+      // Reopening clears the signature: the reopened document is not the
+      // record that was signed. The snapshot above is.
+      await tx.assessment.update({
+        where: { id: assessmentId },
+        data: { status: "draft", signedOffAt: null, signedOffById: null },
+      });
+    });
+  } catch (error) {
+    return { ok: false, error: explainDbError(error) };
+  }
 
   revalidatePath("/register");
-  revalidatePath(`/assessments/${parsed.data.assessment_id}/author`);
+  revalidatePath(`/assessments/${assessmentId}/author`);
   return { ok: true };
 }
 
 async function writeRevisionSnapshot(
+  tx: Tx,
   assessmentId: string,
   reason: string,
-  createdBy: string,
-): Promise<ActionResult> {
-  const supabase = await createClient();
+  createdById: string,
+): Promise<void> {
+  const assessment = await tx.assessment.findUnique({
+    where: { id: assessmentId },
+    include: { findings: { orderBy: { sortOrder: "asc" } } },
+  });
+  if (!assessment) throw new Error("That assessment could not be found.");
 
-  const [{ data: assessment }, { data: findings }, { data: last }] = await Promise.all([
-    supabase.from("assessment").select("*").eq("id", assessmentId).maybeSingle(),
-    supabase.from("finding").select("*").eq("assessment_id", assessmentId).order("sort_order"),
-    supabase
-      .from("revision")
-      .select("revision_no")
-      .eq("assessment_id", assessmentId)
-      .order("revision_no", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
-
-  if (!assessment) return { ok: false, error: "That assessment could not be found." };
-
-  const { error } = await supabase.from("revision").insert({
-    assessment_id: assessmentId,
-    centre_id: assessment.centre_id,
-    revision_no: (last?.revision_no ?? 0) + 1,
-    snapshot: { assessment, findings: findings ?? [] },
-    reason,
-    created_by: createdBy,
+  const last = await tx.revision.findFirst({
+    where: { assessmentId },
+    orderBy: { revisionNo: "desc" },
+    select: { revisionNo: true },
   });
 
-  if (error) return { ok: false, error: fromPostgres(error.message) };
-  return { ok: true };
+  const { findings, ...rest } = assessment;
+
+  await tx.revision.create({
+    data: {
+      assessmentId,
+      centreId: assessment.centreId,
+      revisionNo: (last?.revisionNo ?? 0) + 1,
+      // Dates are serialised so the snapshot is plain JSON an inspector's
+      // tooling can read in ten years without this codebase.
+      snapshot: JSON.parse(JSON.stringify({ assessment: rest, findings })),
+      reason,
+      createdById,
+    },
+  });
 }

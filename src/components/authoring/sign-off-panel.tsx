@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Lock, Send } from "lucide-react";
 import type { AssessmentDetail } from "@/lib/data/assessments";
-import type { ProfileRow } from "@/lib/db/types";
+import type { AppProfile } from "@/lib/db";
 import { createRevision, signOffAssessment, submitForReview } from "@/lib/actions/assessments";
 import { Button } from "@/components/ui/button";
 import { Field, Textarea } from "@/components/ui/field";
@@ -26,7 +26,7 @@ export function SignOffPanel({
   onBeforeSignOff,
 }: {
   detail: AssessmentDetail;
-  people: ProfileRow[];
+  people: AppProfile[];
   canSignOff: boolean;
   recordedCount: number;
   onBeforeSignOff: () => Promise<boolean>;
@@ -37,7 +37,7 @@ export function SignOffPanel({
   const [revising, setRevising] = React.useState(false);
 
   const { assessment } = detail;
-  const signer = people.find((p) => p.id === assessment.signed_off_by);
+  const signer = people.find((p) => p.id === assessment.signedOffById);
 
   // ---- already signed off ----------------------------------------
   if (assessment.status === "signed_off") {
@@ -50,9 +50,9 @@ export function SignOffPanel({
               Signed off and in force
             </h2>
             <p className="mt-1.5 text-ui text-ink-soft">
-              Signed by {signer?.full_name ?? "a centre manager"} on{" "}
+              Signed by {signer?.fullName ?? "a centre manager"} on{" "}
               <span className="font-mono text-data-xs">
-                {formatDateTime(assessment.signed_off_at)}
+                {formatDateTime(assessment.signedOffAt)}
               </span>
               . The record is now part of the audit trail and cannot be edited.
             </p>
@@ -76,7 +76,7 @@ export function SignOffPanel({
                   }}
                   className="mt-4 space-y-3"
                 >
-                  <input type="hidden" name="assessment_id" value={assessment.id} />
+                  <input type="hidden" name="assessmentId" value={assessment.id} />
                   <Field
                     label="What is being corrected?"
                     htmlFor="revision-reason"

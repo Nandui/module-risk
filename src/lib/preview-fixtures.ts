@@ -16,7 +16,8 @@ import { reviewState } from "@/lib/utils";
  */
 
 const DAY = 86_400_000;
-const at = (days: number) => new Date(Date.now() + days * DAY).toISOString();
+const at = (days: number) => new Date(Date.now() + days * DAY);
+const iso = (days: number) => at(days).toISOString();
 
 interface Spec {
   ref: string;
@@ -147,7 +148,7 @@ export const PREVIEW_REGISTER: RegisterRow[] = SPECS.map((spec, i) => {
   const residualScore = spec.findings
     ? riskScore(spec.residual[0], spec.residual[1])
     : 0;
-  const dueAt = spec.dueInDays === null ? null : at(spec.dueInDays);
+  const dueAt = spec.dueInDays === null ? null : iso(spec.dueInDays);
 
   return {
     id: `preview-${i}`,
@@ -169,7 +170,7 @@ export const PREVIEW_REGISTER: RegisterRow[] = SPECS.map((spec, i) => {
     residualSeverity: spec.residual[1],
     band: residualScore > 0 ? riskBand(residualScore) : null,
     openActions: spec.openActions,
-    signedOffAt: spec.status === "signed_off" ? at(-200) : null,
+    signedOffAt: spec.status === "signed_off" ? iso(-200) : null,
   };
 });
 
@@ -179,7 +180,7 @@ const FINDINGS: {
   guidance: string;
   initial: [number, number];
   residual: [number, number];
-  persons: AssessmentDetail["findings"][number]["persons_at_risk"];
+  persons: AssessmentDetail["findings"][number]["personsAtRisk"];
   controls: string[];
   notes?: string;
   action?: string;
@@ -261,48 +262,51 @@ export const PREVIEW_ASSESSMENT: AssessmentDetail = {
   assessment: {
     id: "preview-detail",
     reference: "RA-HT-0003",
-    centre_id: "centre-HT",
-    template_id: "template-plant",
+    centreId: "centre-HT",
+    templateId: "template-plant",
     title: "Pool plant and chemical handling",
     status: "signed_off",
-    assessor_id: "p1",
-    reviewed_by: "p2",
-    review_frequency_months: 12,
-    review_due_at: at(-31),
-    signed_off_at: at(-396),
-    signed_off_by: "p2",
-    scope_note:
+    assessorId: "p1",
+    reviewedById: "p2",
+    reviewFrequencyMonths: 12,
+    reviewDueAt: at(-31),
+    signedOffAt: at(-396),
+    signedOffById: "p2",
+    scopeNote:
       "Handling, dosing and storage of pool treatment chemicals, including the delivery bay and the balance tank. Excludes the wet-side changing village, which is assessed separately.",
-    created_at: at(-400),
-    updated_at: at(-396),
+    createdAt: at(-400),
+    updatedAt: at(-396),
   },
   centre: {
     id: "centre-HT",
     name: "Hilltop Sports & Pool",
     code: "HT",
     address: "Beacon Road, Hilltop",
-    created_at: at(-900),
+    createdAt: at(-900),
   },
   assessor: {
     id: "p1",
-    full_name: "James Okafor",
+    fullName: "James Okafor",
     email: "james@example.com",
     role: "assessor",
-    created_at: at(-900),
+    isActive: true,
+    createdAt: at(-900),
   },
   signedOffBy: {
     id: "p2",
-    full_name: "Marcus Yeo",
+    fullName: "Marcus Yeo",
     email: "marcus@example.com",
     role: "manager",
-    created_at: at(-900),
+    isActive: true,
+    createdAt: at(-900),
   },
   reviewedBy: {
     id: "p2",
-    full_name: "Marcus Yeo",
+    fullName: "Marcus Yeo",
     email: "marcus@example.com",
     role: "manager",
-    created_at: at(-900),
+    isActive: true,
+    createdAt: at(-900),
   },
   templateName: "Pool plant room",
   findings: FINDINGS.map((f, i) => {
@@ -310,19 +314,19 @@ export const PREVIEW_ASSESSMENT: AssessmentDetail = {
     const residualScore = riskScore(f.residual[0], f.residual[1]);
     return {
       id: `finding-${i}`,
-      assessment_id: "preview-detail",
-      hazard_id: `hazard-${i}`,
-      sort_order: i,
+      assessmentId: "preview-detail",
+      hazardId: `hazard-${i}`,
+      sortOrder: i,
       likelihood: f.initial[0],
       severity: f.initial[1],
-      control_measure_ids: f.controls.map((_, ci) => `control-${i}-${ci}`),
-      residual_likelihood: f.residual[0],
-      residual_severity: f.residual[1],
-      persons_at_risk: f.persons,
+      controlMeasureIds: f.controls.map((_, ci) => `control-${i}-${ci}`),
+      residualLikelihood: f.residual[0],
+      residualSeverity: f.residual[1],
+      personsAtRisk: f.persons,
       notes: f.notes ?? null,
-      photo_ids: [],
-      created_at: at(-400),
-      updated_at: at(-396),
+      photoIds: [],
+      createdAt: at(-400),
+      updatedAt: at(-396),
       hazardLabel: f.hazard,
       hazardCategory: f.category,
       hazardGuidance: f.guidance,
@@ -331,15 +335,15 @@ export const PREVIEW_ASSESSMENT: AssessmentDetail = {
         ? [
             {
               id: `action-${i}`,
-              finding_id: `finding-${i}`,
-              centre_id: "centre-HT",
+              findingId: `finding-${i}`,
+              centreId: "centre-HT",
               description: f.action,
-              owner_id: "p2",
-              due_at: at(-9),
-              closed_at: null,
-              closed_by: null,
-              closure_note: null,
-              created_at: at(-396),
+              ownerId: "p2",
+              dueAt: at(-9),
+              closedAt: null,
+              closedById: null,
+              closureNote: null,
+              createdAt: at(-396),
             },
           ]
         : [],
@@ -351,23 +355,23 @@ export const PREVIEW_ASSESSMENT: AssessmentDetail = {
   revisions: [
     {
       id: "rev-2",
-      assessment_id: "preview-detail",
-      centre_id: "centre-HT",
-      revision_no: 2,
+      assessmentId: "preview-detail",
+      centreId: "centre-HT",
+      revisionNo: 2,
       snapshot: {},
       reason: "Corrected the residual rating on acid dosing after the eyewash station was reinstated.",
-      created_by: "p2",
-      created_at: at(-120),
+      createdById: "p2",
+      createdAt: at(-120),
     },
     {
       id: "rev-1",
-      assessment_id: "preview-detail",
-      centre_id: "centre-HT",
-      revision_no: 1,
+      assessmentId: "preview-detail",
+      centreId: "centre-HT",
+      revisionNo: 1,
       snapshot: {},
       reason: "Initial sign-off",
-      created_by: "p2",
-      created_at: at(-396),
+      createdById: "p2",
+      createdAt: at(-396),
     },
   ],
   headlineInitial: 12,
@@ -437,7 +441,7 @@ const ACTION_SPECS: [string, string, string, string, number, [number, number]][]
 export const PREVIEW_ACTIONS: ActionListRow[] = ACTION_SPECS.map(
   ([description, owner, centreName, centreCode, dueInDays, residual], i) => {
     const residualScore = riskScore(residual[0], residual[1]);
-    const dueAt = at(dueInDays);
+    const dueAt = iso(dueInDays);
     return {
       id: `preview-action-${i}`,
       description,

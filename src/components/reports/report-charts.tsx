@@ -68,14 +68,14 @@ export function OverdueByCentre({ centres }: { centres: CentreFigure[] }) {
       note="Past the review date set at sign-off"
     >
       <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
           <CartesianGrid
             stroke="var(--color-rule)"
             strokeDasharray="0"
             vertical={false}
           />
           <XAxis dataKey="name" {...AXIS} tickLine={false} />
-          <YAxis {...AXIS} tickLine={false} allowDecimals={false} width={32} />
+          <YAxis {...AXIS} tickLine={false} allowDecimals={false} width={28} />
           <Tooltip
             content={<ChartTooltip unit="overdue" />}
             cursor={{ fill: "var(--color-surface-sunk)" }}
@@ -108,10 +108,10 @@ export function HighRiskActionsByCentre({ centres }: { centres: CentreFigure[] }
       note="Open actions on findings in band 4 or 5"
     >
       <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--color-rule)" strokeDasharray="0" vertical={false} />
           <XAxis dataKey="name" {...AXIS} tickLine={false} />
-          <YAxis {...AXIS} tickLine={false} allowDecimals={false} width={32} />
+          <YAxis {...AXIS} tickLine={false} allowDecimals={false} width={28} />
           <Tooltip
             content={<ChartTooltip unit="open actions" />}
             cursor={{ fill: "var(--color-surface-sunk)" }}
@@ -154,10 +154,16 @@ export function SeverityTrend({ trend }: { trend: TrendPoint[] }) {
       {/* One measure, one axis. The count of high-risk findings is a different
           scale and lives in the comparison table, not on a second y-axis. */}
       <ResponsiveContainer width="100%" height={180}>
-        <LineChart data={trend} margin={{ top: 8, right: 8, bottom: 0, left: -20 }}>
+        <LineChart data={trend} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="var(--color-rule)" strokeDasharray="0" vertical={false} />
           <XAxis dataKey="label" {...AXIS} tickLine={false} interval="preserveStartEnd" />
-          <YAxis {...AXIS} tickLine={false} width={32} domain={[0, 25]} />
+          <YAxis
+            {...AXIS}
+            tickLine={false}
+            width={30}
+            domain={[0, 25]}
+            ticks={[0, 5, 10, 15, 20, 25]}
+          />
           <Tooltip
             content={<ChartTooltip unit="mean residual score" />}
             cursor={{ stroke: "var(--color-rule-strong)" }}

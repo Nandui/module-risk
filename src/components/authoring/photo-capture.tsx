@@ -1,11 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { upload } from "@vercel/blob/client";
 import { Camera, Trash2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-
-const BUCKET = "evidence";
 
 /**
  * Photo evidence, captured on the device camera.
@@ -14,9 +12,10 @@ const BUCKET = "evidence";
  * tablet — an assessor photographing a cracked tile should not have to go
  * through a file picker.
  *
- * Uploads go directly to Storage rather than through a Server Action: a
- * 10 MB photo has no business travelling through a serverless function, and
- * the bucket's RLS policy checks the centre from the object path.
+ * Uploads go directly to Vercel Blob; /api/blob/upload only issues a
+ * constrained token and checks the assessor may write to that centre. The
+ * store is private, so what is kept here is the Blob URL and access is
+ * governed by the store's own token, not by guessing a path.
  */
 export function PhotoCapture({
   centreId,
@@ -33,57 +32,31 @@ export function PhotoCapture({
 }) {
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState<string>();
-  const [urls, setUrls] = React.useState<Record<string, string>>({});
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  // The bucket is private, so thumbnails need signed URLs.
-  React.useEffect(() => {
-    const missing = photoIds.filter((id) => !urls[id]);
-    if (missing.length === 0) return;
-
-    let cancelled = false;
-    void (async () => {
-      const supabase = createClient();
-      const { data } = await supabase.storage
-        .from(BUCKET)
-        .createSignedUrls(missing, 60 * 60);
-      if (cancelled || !data) return;
-      setUrls((prev) => {
-        const next = { ...prev };
-        for (const entry of data) {
-          if (entry.path && entry.signedUrl) next[entry.path] = entry.signedUrl;
-        }
-        return next;
-      });
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [photoIds, urls]);
-
-  async function upload(files: FileList) {
+  async function uploadFiles(files: FileList) {
     setBusy(true);
     setError(undefined);
-    const supabase = createClient();
     const added: string[] = [];
 
     for (const file of Array.from(files)) {
       const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      // The centre is the first path segment so the bucket policy can check
-      // it without a join.
-      const path = `${centreId}/${assessmentId}/${crypto.randomUUID()}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, file, { cacheControl: "3600", upsert: false });
+      // The centre is the first path segment so the token route can check it
+      // without a database round trip per file.
+      const pathname = `${centreId}/${assessmentId}/${crypto.randomUUID()}.${ext}`;
 
-      if (uploadError) {
+      try {
+        const blob = await upload(pathname, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob/upload",
+          contentType: file.type,
+        });
+        added.push(blob.url);
+      } catch (uploadError) {
         setError(
-          `${file.name} did not upload. ${uploadError.message} Try again, or carry on and add it later.`,
+          `${file.name} did not upload. ${(uploadError as Error).message} Try again, or carry on and add it later.`,
         );
-        continue;
       }
-      added.push(path);
     }
 
     if (added.length > 0) onChange([...photoIds, ...added]);
@@ -91,36 +64,31 @@ export function PhotoCapture({
     if (inputRef.current) inputRef.current.value = "";
   }
 
-  async function remove(path: string) {
-    const supabase = createClient();
-    await supabase.storage.from(BUCKET).remove([path]);
-    onChange(photoIds.filter((id) => id !== path));
+  function remove(url: string) {
+    // The row is detached here; the blob itself is swept separately, because
+    // deleting evidence attached to a since-signed assessment must not be
+    // possible from a form.
+    onChange(photoIds.filter((id) => id !== url));
   }
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        {photoIds.map((path) => (
+        {photoIds.map((url) => (
           <span
-            key={path}
+            key={url}
             className="relative block size-20 overflow-hidden rounded-[var(--radius)] border border-rule bg-surface-sunk"
           >
-            {urls[path] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={urls[path]}
-                alt="Photo evidence attached to this finding"
-                className="size-full object-cover"
-              />
-            ) : (
-              <span className="grid size-full place-items-center text-ui-sm text-faint">
-                …
-              </span>
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={url}
+              alt="Photo evidence attached to this finding"
+              className="size-full object-cover"
+            />
             {!disabled ? (
               <button
                 type="button"
-                onClick={() => void remove(path)}
+                onClick={() => remove(url)}
                 aria-label="Remove this photo"
                 className="absolute right-1 top-1 grid size-6 place-items-center rounded-[3px] bg-surface-raised/90 text-ink-soft hover:text-risk-5-ink"
               >
@@ -147,7 +115,7 @@ export function PhotoCapture({
               multiple
               className="sr-only"
               onChange={(event) => {
-                if (event.target.files?.length) void upload(event.target.files);
+                if (event.target.files?.length) void uploadFiles(event.target.files);
               }}
             />
           </label>
