@@ -87,22 +87,35 @@ role. The setup script then tells you so. Recover with:
 
 Step 3 above grants the privileges, so the hand-created role ends up identical.
 
-## 4. Vercel environment variables
+## 4. What the build does for you
+
+`vercel.json` runs `scripts/vercel-build.mjs`, which:
+
+- fills `DIRECT_URL` from `DATABASE_URL_UNPOOLED` if you have not set it — the
+  name the Neon integration uses — so its managed variables work untouched
+- **fails the build if `APP_DATABASE_URL` is missing**, rather than letting the
+  app deploy running as the database owner with every policy bypassed. A broken
+  build is easier to notice than a silent security downgrade.
+- then runs `prisma generate`, `prisma migrate deploy`, `next build`
+
+At runtime, `pgbouncer=true` is added automatically to any `-pooler` host, so a
+connection string pasted straight from Neon behaves.
+
+## 5. Vercel environment variables
 
 Project → Settings → Environment Variables:
 
 | Variable | Value |
 | --- | --- |
-| `DATABASE_URL` | pooled, owner, `?sslmode=require&pgbouncer=true` |
-| `DIRECT_URL` | unpooled, owner, `?sslmode=require` |
-| `APP_DATABASE_URL` | pooled, `module_risk_app`, `?sslmode=require&pgbouncer=true` |
+| `DATABASE_URL` | pooled, owner. Often already set by the Neon integration — leave it. |
+| `DIRECT_URL` | unpooled, owner. Optional if `DATABASE_URL_UNPOOLED` exists. |
+| `APP_DATABASE_URL` | pooled, `module_risk_app`. **You must set this**; the build fails without it. |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect |
 
-`vercel.json` already runs `prisma generate && prisma migrate deploy && next
-build`, so a deploy applies any new migration before the new code serves.
+A deploy applies any new migration before the new code serves.
 
-## 5. Pooling and the RLS transaction
+## 6. Pooling and the RLS transaction
 
 Every query goes through `withUser()`, which opens a transaction and sets a
 transaction-local session variable:
@@ -120,7 +133,7 @@ It also means an unidentified connection reads *nothing* rather than
 everything — verified by `npm run verify:db`, and again against your real
 database by the setup script.
 
-## 6. Before real data goes in
+## 7. Before real data goes in
 
 - Rotate `neondb_owner`'s password if it has ever been pasted anywhere.
 - Remove the demo accounts from `prisma/seed.ts`, or change `SEED_PASSWORD`.

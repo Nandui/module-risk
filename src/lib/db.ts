@@ -1,5 +1,6 @@
 import "server-only";
 import { Prisma, PrismaClient, type Profile } from "@prisma/client";
+import { normalisePooledUrl } from "@/lib/db-url";
 
 /**
  * Database access.
@@ -33,7 +34,7 @@ const globalForPrisma = globalThis as unknown as { prisma?: DbClient };
 
 function appDatabaseUrl(): string {
   const appUrl = process.env.APP_DATABASE_URL;
-  if (appUrl) return appUrl;
+  if (appUrl) return normalisePooledUrl(appUrl);
 
   // Falling back to the owner role silently would disable RLS — the exact
   // failure this setup exists to prevent. Loud in production, tolerated in
@@ -56,7 +57,7 @@ function appDatabaseUrl(): string {
     "\n[db] APP_DATABASE_URL is not set, falling back to DATABASE_URL.\n" +
       "[db] Row level security is NOT in force on that connection — the owner role bypasses it.\n",
   );
-  return ownerUrl;
+  return normalisePooledUrl(ownerUrl);
 }
 
 /**

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "node scripts/vercel-build.mjs",
     "start": "next start",
     "postinstall": "prisma generate",
     "typecheck": "tsc --noEmit",
@@ -15,8 +15,9 @@
     "db:reset": "prisma migrate reset",
     "verify:db": "node scripts/verify-db.mjs",
     "verify:risk": "node --experimental-strip-types scripts/verify-risk.ts",
-    "verify": "npm run typecheck && npm run verify:risk && npm run verify:db",
-    "db:local": "node scripts/dev-db.mjs start"
+    "verify": "npm run typecheck && npm run verify:url && npm run verify:risk && npm run verify:db",
+    "db:local": "node scripts/dev-db.mjs start",
+    "verify:url": "node --experimental-strip-types scripts/check-url.mts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
