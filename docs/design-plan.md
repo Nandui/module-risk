@@ -203,5 +203,14 @@ What that costs and what it buys:
 The app connects as a least-privilege `module_risk_app` role, never as the
 owner: RLS does not apply to a table's owner, so running the app on the
 migration connection would silently disable every policy. `src/lib/db.ts`
-refuses to start in production without `APP_DATABASE_URL` for exactly that
+refuses to start in production on the owner connection for exactly that
 reason.
+
+That role's credentials are derived rather than configured — an HMAC keyed on
+the owner password, which is already present wherever this app runs. The
+reasoning is a design decision, not a convenience: the second connection
+string had exactly one failure mode, pointing it at the owner, and that
+failure produces a working application that enforces nothing. A configuration
+option whose only wrong setting is invisible should not be a configuration
+option. `AUTH_SECRET` stays explicit, because it signs session cookies and a
+leaked database credential should not also forge sessions.

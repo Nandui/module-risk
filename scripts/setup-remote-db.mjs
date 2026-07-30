@@ -7,7 +7,8 @@
  *   1. checks what is already there, and refuses to touch a database that
  *      holds tables it does not recognise
  *   2. applies the migrations (which create the module_risk_app role)
- *   3. sets that role's password — generated unless APP_DB_PASSWORD is given
+ *   3. sets that role's password — the same one the app derives, unless
+ *      APP_DB_PASSWORD is given
  *   4. seeds the libraries and, on an empty database, the sample assessments
  *   5. connects AS the app role and proves row level security is in force
  *   6. prints the connection strings to put in Vercel
@@ -16,8 +17,8 @@
  * re-run — the migrations are versioned and the seed upserts.
  */
 import { execFileSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
 import pg from "pg";
+import { APP_ROLE, deriveAppPassword } from "../src/lib/app-connection.mjs";
 
 const OWNER_URL = process.env.DATABASE_URL;
 const DIRECT_URL = process.env.DIRECT_URL ?? OWNER_URL;
@@ -33,8 +34,20 @@ if (!OWNER_URL) {
   process.exit(1);
 }
 
-const APP_PASSWORD = process.env.APP_DB_PASSWORD ?? randomBytes(24).toString("base64url");
-const generated = !process.env.APP_DB_PASSWORD;
+// By default the app role's password is derived from the owner's, exactly as
+// the running app derives it — so there is no secret to carry from here to
+// Vercel, and APP_DATABASE_URL need not be set at all.
+const APP_PASSWORD = process.env.APP_DB_PASSWORD ?? deriveAppPassword(OWNER_URL);
+const supplied = Boolean(process.env.APP_DB_PASSWORD);
+
+if (!APP_PASSWORD) {
+  console.error(
+    "\nDATABASE_URL has no password, so the app role's password cannot be\n" +
+      "derived from it. Re-run with APP_DB_PASSWORD set to the password you\n" +
+      "want module_risk_app to have, and put it in APP_DATABASE_URL.\n",
+  );
+  process.exit(1);
+}
 
 /** Our tables, so an unrelated database can be recognised and left alone. */
 const OURS = new Set([
@@ -131,17 +144,16 @@ await owner.query(`
 console.log("   DML only, and no read on profile.password_hash");
 
 step("Setting the application role's password");
-if (!generated) {
-  // Supplied, so it was already set wherever the role was created. Changing
-  // it here would only break the value the caller already holds — and on a
-  // provider that withholds ALTER ROLE it would fail outright.
-  console.log("   using the supplied APP_DB_PASSWORD, leaving the role alone");
-} else {
+{
   try {
     await owner.query(
-      `alter role module_risk_app with password '${APP_PASSWORD.replace(/'/g, "''")}'`,
+      `alter role ${APP_ROLE} with password '${APP_PASSWORD.replace(/'/g, "''")}'`,
     );
-    console.log("   module_risk_app updated");
+    console.log(
+      supplied
+        ? "   set to the supplied APP_DB_PASSWORD"
+        : "   set to the value the app derives — nothing to copy anywhere",
+    );
   } catch (error) {
     console.error(
       `\n   Could not set the password: ${error.message}\n\n` +
@@ -162,7 +174,7 @@ execFileSync("npx", ["tsx", "prisma/seed.ts"], {
 step("Checking row level security");
 
 const appUrl = new URL(DIRECT_URL);
-appUrl.username = "module_risk_app";
+appUrl.username = APP_ROLE;
 appUrl.password = APP_PASSWORD;
 
 const app = new pg.Client({
@@ -224,7 +236,7 @@ await owner.end();
 const pooled = process.env.POOLED_URL;
 const appPooled = pooled ? new URL(pooled) : null;
 if (appPooled) {
-  appPooled.username = "module_risk_app";
+  appPooled.username = APP_ROLE;
   appPooled.password = APP_PASSWORD;
   // Prisma needs prepared statements off behind a transaction pooler.
   appPooled.searchParams.set("pgbouncer", "true");
@@ -237,22 +249,22 @@ Set these in Vercel (Project → Settings → Environment Variables):
 
   DATABASE_URL       ${pooled ? maskUrl(pooled) : "<pooled owner URL>"}
   DIRECT_URL         ${maskUrl(DIRECT_URL)}
-  APP_DATABASE_URL   ${appPooled ? maskUrl(appPooled.toString()) : "<pooled URL, user module_risk_app, add ?pgbouncer=true>"}
-  AUTH_SECRET        <openssl rand -base64 32>
+  APP_DATABASE_URL   ${appPooled ? maskUrl(appPooled.toString()) : "<optional — derived from DATABASE_URL when unset>"}
+  AUTH_SECRET        <openssl rand -base64 32>   # the only one you must invent
   BLOB_READ_WRITE_TOKEN  <Storage → Blob → connect>
 ${
-  generated
+  supplied
     ? `
-The module_risk_app password was generated. It is printed once, here:
-
-  ${APP_PASSWORD}
-
-Put it in APP_DATABASE_URL and keep a copy — this script does not store it.`
-    : ""
+APP_DATABASE_URL is required here, because you supplied APP_DB_PASSWORD: the
+app cannot derive a password it did not choose.`
+    : `
+APP_DATABASE_URL is OPTIONAL. The app derives exactly the connection above
+from DATABASE_URL, so leaving it unset is fine — and is one fewer string to
+get wrong. Set it only if you want the app on a different role or host.`
 }
-APP_DATABASE_URL is what the app runs on. It must NOT be the owner role:
-row level security does not apply to a table's owner, so running the app on
-DATABASE_URL would silently disable every policy.
+Whatever it is set to, it must NOT be the owner role: row level security does
+not apply to a table's owner, so running the app on DATABASE_URL would
+silently disable every policy.
 `);
 
 function maskUrl(value) {

@@ -10,7 +10,13 @@
  * Everything here is idempotent. It creates and grants; it never drops.
  */
 import { execFileSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import pg from "pg";
+import {
+  APP_ROLE,
+  deriveAppDatabaseUrl,
+  normalisePooledUrl,
+} from "../src/lib/app-connection.mjs";
 
 const env = { ...process.env };
 
@@ -42,20 +48,48 @@ if (!env.DATABASE_URL) {
   );
 }
 
-// A missing APP_DATABASE_URL is a security problem, not a build problem: the
-// app would otherwise run as the database owner, for whom row level security
-// does not apply. Fail here — a broken build is easier to notice than a
-// deployment that quietly enforces nothing.
+// Neon hands out strings with `channel_binding=require`, which Prisma's
+// driver does not implement, and without `pgbouncer=true`, which it needs
+// behind the pooler. The integration manages these variables, so the fix
+// belongs here rather than in a hand-edited copy.
+env.DATABASE_URL = normalisePooledUrl(env.DATABASE_URL);
+env.DIRECT_URL = normalisePooledUrl(env.DIRECT_URL);
+
+// The app must connect as module_risk_app, never as the owner: row level
+// security does not apply to a table's owner, so running on the owner
+// connection would silently bypass every policy in the database.
+//
+// Rather than make that a variable somebody has to compose correctly — the
+// one mistake with no symptom — it is derived from the owner connection when
+// unset, and the same derivation runs inside the app. See
+// src/lib/app-connection.mjs.
+let derivedApp = false;
 if (!env.APP_DATABASE_URL) {
+  const derived = deriveAppDatabaseUrl(env.DATABASE_URL);
+  if (!derived) {
+    fatal(
+      "APP_DATABASE_URL is not set, and it could not be derived because\n" +
+        "  DATABASE_URL carries no password.\n\n" +
+        "  Either set APP_DATABASE_URL to the pooled host with user `module_risk_app`\n" +
+        "  and a password of your choosing, or point DATABASE_URL at a connection\n" +
+        `  string that includes the owner's password.\n\n` +
+        "  See docs/neon-and-vercel.md.",
+    );
+  }
+  env.APP_DATABASE_URL = derived;
+  derivedApp = true;
+}
+
+// Auth.js signs session cookies with this. It is deliberately NOT derived:
+// keeping it independent of the database password means a leaked database
+// credential cannot also be used to forge sessions.
+if (!env.AUTH_SECRET) {
   fatal(
-    "APP_DATABASE_URL is not set.\n\n" +
-      "  The app must connect as the module_risk_app role, not as the database\n" +
-      "  owner — row level security does not apply to a table's owner, so every\n" +
-      "  policy would be silently bypassed.\n\n" +
-      "  Set it to the POOLED host with user `module_risk_app` and a password of\n" +
-      "  your choosing. This build creates that role and applies the password for\n" +
-      "  you; nothing needs running by hand.\n\n" +
-      "  See docs/neon-and-vercel.md.",
+    "AUTH_SECRET is not set. Auth.js cannot sign session cookies without it.\n\n" +
+      "  Add it in Vercel → Settings → Environment Variables and redeploy. Here is\n" +
+      "  a freshly generated value you can paste straight in:\n\n" +
+      `      ${randomBytes(32).toString("base64")}\n\n` +
+      "  It is the only variable this project needs you to set by hand.",
   );
 }
 
@@ -78,16 +112,20 @@ run("npx", ["prisma", "migrate", "deploy"]);
 // password lives in APP_DATABASE_URL, which only exists here — so this is
 // where the two are reconciled. Rotating the Vercel variable and redeploying
 // is therefore all a password change takes.
-console.log("\n[build] provisioning the application role");
+console.log(
+  `\n[build] provisioning the application role (${
+    derivedApp ? "derived from DATABASE_URL" : "from APP_DATABASE_URL"
+  })`,
+);
 
 const appUrl = new URL(env.APP_DATABASE_URL);
 const appRole = decodeURIComponent(appUrl.username);
 const appPassword = decodeURIComponent(appUrl.password);
 
-if (appRole !== "module_risk_app") {
+if (appRole !== APP_ROLE) {
   fatal(
     `APP_DATABASE_URL uses the role "${appRole}".\n\n` +
-      "  It must be `module_risk_app`. Pointing it at the owner role is the one\n" +
+      `  It must be \`${APP_ROLE}\`. Pointing it at the owner role is the one\n` +
       "  configuration that disables row level security without any other symptom.",
   );
 }
@@ -126,7 +164,9 @@ try {
     await owner.query(
       `alter role module_risk_app with password '${appPassword.replace(/'/g, "''")}'`,
     );
-    console.log("[build]   password synced from APP_DATABASE_URL");
+    console.log(
+      `[build]   password synced${derivedApp ? " (derived)" : " from APP_DATABASE_URL"}`,
+    );
   } catch (error) {
     console.warn(
       `[build]   could not set the password (${error.message}) — assuming it is` +
@@ -174,7 +214,18 @@ const app = new pg.Client({
   connectionString: env.APP_DATABASE_URL,
   connectionTimeoutMillis: 20_000,
 });
-await app.connect();
+try {
+  await app.connect();
+} catch (error) {
+  fatal(
+    `Could not connect as ${APP_ROLE}: ${error.message}\n\n` +
+      (derivedApp
+        ? "  The password could not be applied to the role above, so the running app\n" +
+          "  will not be able to connect either. Check that the database owner can\n" +
+          "  ALTER ROLE, or set APP_DATABASE_URL explicitly."
+        : "  Check the password in APP_DATABASE_URL."),
+  );
+}
 try {
   await app.query("begin");
   const { rows } = await app.query("select count(*)::int n from assessment");

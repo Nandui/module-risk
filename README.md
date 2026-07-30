@@ -90,17 +90,24 @@ APP_DATABASE_URL  the module_risk_app role — what the app runs on
 **Row level security does not apply to a table's owner.** Running the app on the
 migration connection would silently disable every policy in the database, so the
 app must connect as the least-privilege role instead. `src/lib/db.ts` throws in
-production if `APP_DATABASE_URL` is missing, and warns loudly in development,
-because a silent downgrade here is the exact failure this setup exists to
-prevent.
+production rather than fall back to the owner, because a silent downgrade here
+is the exact failure this setup exists to prevent.
 
-The second migration creates the role. Give it a password once:
+`APP_DATABASE_URL` is nevertheless **optional**, and normally unset. The app
+role's password is an HMAC keyed on the owner's, which is already in
+`DATABASE_URL` wherever this app runs: the deploy applies that value to the
+role, the app computes the same value, and neither stores it. So the second
+connection string is derived rather than configured — which matters because
+composing it by hand has exactly one failure mode, pointing it at the owner,
+and that failure has no symptom.
 
-```sql
-ALTER ROLE module_risk_app WITH PASSWORD 'a-long-random-string';
-```
+Deriving it from the owner password weakens nothing: anyone holding that
+password already has unrestricted access to the database. `AUTH_SECRET` is
+pointedly not derived the same way — it signs session cookies, and a leaked
+database credential should not also be able to forge sessions. It is the only
+variable a deployment must be given.
 
-It has DML on every table and nothing else — no DDL, no `TRUNCATE`, and no
+The role itself has DML on every table and nothing else — no DDL, no `TRUNCATE`, and no
 `SELECT` on `profile.password_hash`. Sign-in reads the hash through a
 `SECURITY DEFINER` function, so an ordinary query cannot leak it even by
 accident. Prisma is configured with `omit: { profile: { passwordHash: true } }`
@@ -129,6 +136,7 @@ Three harnesses. None of them needs a hosted database.
 npm run verify        # all three
 npm run verify:db     # migrations, seed, append-only guards, RLS behaviour
 npm run verify:risk   # 38 invariants of the risk engine
+npm run verify:url    # connection-string handling and the derived app role
 npm run typecheck
 ```
 
@@ -228,17 +236,18 @@ Environment variables:
 
 | Variable | Notes |
 | --- | --- |
-| `DATABASE_URL` | Owner role. Used by `prisma migrate deploy` in the build. |
-| `DIRECT_URL` | Direct (unpooled) host — Prisma migrate needs it. |
-| `APP_DATABASE_URL` | The `module_risk_app` role. What the running app uses. |
-| `AUTH_SECRET` | `openssl rand -base64 32` |
-| `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect |
+| `AUTH_SECRET` | `openssl rand -base64 32`. The only one you must set by hand. |
+| `DATABASE_URL` | Owner role. Set by the Neon/Postgres integration. |
+| `DIRECT_URL` | Direct (unpooled) host — Prisma migrate needs it. Filled from `DATABASE_URL_UNPOOLED` when unset. |
+| `APP_DATABASE_URL` | Optional. Derived from `DATABASE_URL` when unset. |
+| `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect. Photo evidence only. |
 
 See [`docs/neon-and-vercel.md`](docs/neon-and-vercel.md) for which Neon URL goes
 in which variable, and why the app must not run on the owner connection.
 
-`vercel.json` runs `prisma generate && prisma migrate deploy && next build`, and
-gives the two PDF routes 2 GB and 60 seconds — they run headless Chromium via
+`vercel.json` runs `scripts/vercel-build.mjs`, which migrates, provisions the
+app role, seeds an empty database, refuses to continue unless an unidentified
+connection reads nothing, and only then builds. It gives the two PDF routes 2 GB and 60 seconds — they run headless Chromium via
 `@sparticuz/chromium`. Locally the PDF renderer picks up a system Chromium, or
 whatever `CHROMIUM_EXECUTABLE_PATH` points at.
 
@@ -249,5 +258,6 @@ PDF can never contain more than the person requesting it is allowed to see.
 
 - Remove or change the demo accounts in `prisma/seed.ts`. They all share one
   password.
-- Set a real password on `module_risk_app` and point `APP_DATABASE_URL` at it.
 - `AUTH_SECRET` must not be the development placeholder.
+- Rotating the owner password also rotates the derived app-role password.
+  Redeploy afterwards so the build applies the new one.

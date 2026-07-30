@@ -1,6 +1,6 @@
 import "server-only";
 import { Prisma, PrismaClient, type Profile } from "@prisma/client";
-import { normalisePooledUrl } from "@/lib/db-url";
+import { deriveAppDatabaseUrl, normalisePooledUrl } from "@/lib/app-connection.mjs";
 
 /**
  * Database access.
@@ -36,25 +36,35 @@ function appDatabaseUrl(): string {
   const appUrl = process.env.APP_DATABASE_URL;
   if (appUrl) return normalisePooledUrl(appUrl);
 
-  // Falling back to the owner role silently would disable RLS — the exact
-  // failure this setup exists to prevent. Loud in production, tolerated in
-  // development with a warning.
+  const ownerUrl = process.env.DATABASE_URL;
+
+  // Nothing was configured, so derive it: same host and database, the app
+  // role, and a password computed from the owner's. The deploy applies that
+  // same password to the role, so the two agree without either storing it.
+  // See src/lib/app-connection.mjs for why this does not weaken anything.
+  const derived = deriveAppDatabaseUrl(ownerUrl);
+  if (derived) return normalisePooledUrl(derived);
+
+  // Only reachable when DATABASE_URL is absent or carries no password.
+  // Falling back to the owner role would disable RLS — the exact failure this
+  // setup exists to prevent — so that is a warning in development and an
+  // error in production.
   if (process.env.NODE_ENV === "production") {
     throw new Error(
-      "APP_DATABASE_URL is not set. The app must connect as the module_risk_app role, " +
-        "not as the database owner, or row level security does not apply. " +
+      "APP_DATABASE_URL is not set and could not be derived: DATABASE_URL is " +
+        "missing or has no password. The app must connect as the module_risk_app " +
+        "role, not as the database owner, or row level security does not apply. " +
         "See the README for the two connection strings.",
     );
   }
 
-  const ownerUrl = process.env.DATABASE_URL;
   if (!ownerUrl) {
     throw new Error(
-      "Neither APP_DATABASE_URL nor DATABASE_URL is set. Copy .env.example to .env.local.",
+      "Neither APP_DATABASE_URL nor DATABASE_URL is set. Run `npm run db:local`.",
     );
   }
   console.warn(
-    "\n[db] APP_DATABASE_URL is not set, falling back to DATABASE_URL.\n" +
+    "\n[db] APP_DATABASE_URL is not set and could not be derived, falling back to DATABASE_URL.\n" +
       "[db] Row level security is NOT in force on that connection — the owner role bypasses it.\n",
   );
   return normalisePooledUrl(ownerUrl);

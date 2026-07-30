@@ -16,16 +16,19 @@ import { writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import pg from "pg";
+import { APP_ROLE, deriveAppDatabaseUrl, deriveAppPassword } from "../src/lib/app-connection.mjs";
 
 // Outside the repo: initdb needs to chmod its data directory, which fails on
 // some mounted filesystems, and a Postgres cluster has no business being in
 // a git working tree. Override with DEV_DB_DIR.
 const DIR = process.env.DEV_DB_DIR ?? join(tmpdir(), "module-risk-devdb");
 const PORT = 55432;
-const APP_PASSWORD = "local-app-password";
 
 const OWNER_URL = `postgresql://postgres:postgres@127.0.0.1:${PORT}/risk`;
-const APP_URL = `postgresql://module_risk_app:${APP_PASSWORD}@127.0.0.1:${PORT}/risk`;
+// Derived exactly as the deploy derives it, so development runs on the same
+// least-privilege role as production and RLS is in force here too.
+const APP_PASSWORD = deriveAppPassword(OWNER_URL);
+const APP_URL = deriveAppDatabaseUrl(OWNER_URL);
 
 const command = process.argv[2] ?? "start";
 
@@ -65,7 +68,7 @@ execFileSync("npx", ["prisma", "migrate", "deploy"], { env, stdio: "inherit" });
 // can actually connect as it, and so RLS is in force in development too.
 const owner = new pg.Client({ connectionString: OWNER_URL });
 await owner.connect();
-await owner.query(`alter role module_risk_app with password '${APP_PASSWORD}'`);
+await owner.query(`alter role ${APP_ROLE} with password '${APP_PASSWORD}'`);
 await owner.end();
 
 console.log("seeding…");

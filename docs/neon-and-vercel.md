@@ -13,22 +13,24 @@ Neon gives you two hosts. The difference matters here more than usual.
 | `DATABASE_URL` | `…-pooler.…` | Runtime. Serverless functions open and drop connections constantly; the pooler is what keeps that from exhausting the database. |
 | `DATABASE_URL_UNPOOLED` | no `-pooler` | Migrations. `prisma migrate` needs a real session — DDL and advisory locks do not survive a transaction pooler. |
 
-Map them onto this app's three:
+Map them onto this app's:
 
 ```
 DATABASE_URL      = pooled,   owner role            # Prisma datasource, build-time migrate
 DIRECT_URL        = unpooled, owner role            # what migrate actually connects on
-APP_DATABASE_URL  = pooled,   module_risk_app role  # what the running app uses
+APP_DATABASE_URL  = pooled,   module_risk_app role  # OPTIONAL — derived when unset
 ```
 
-Two edits to the strings Neon hands you:
+Paste Neon's strings in unedited. Two fixes they need are applied in code
+(`src/lib/app-connection.mjs`), because the Neon integration manages these
+variables itself and there is no hand-edited copy for a fix to live in:
 
-- **Add `?pgbouncer=true`** to the pooled URLs. Prisma caches prepared
+- **`pgbouncer=true`** is added to pooled URLs. Prisma caches prepared
   statements, and a transaction pooler hands a different backend to each
   transaction; without this you get sporadic `prepared statement "s0" already
   exists` errors under load.
-- **Drop `channel_binding=require`.** It is a libpq option; Prisma's driver
-  does not implement it, and `sslmode=require` already gives you TLS.
+- **`channel_binding=require` is stripped.** It is a libpq option; Prisma's
+  driver does not implement it, and `sslmode=require` already gives you TLS.
 
 ## 2. Why the app gets its own role
 
@@ -43,19 +45,43 @@ So the app connects as `module_risk_app`, which has:
 - no `SELECT` on `profile.password_hash` — sign-in reads it through a
   `SECURITY DEFINER` function instead
 
-`src/lib/db.ts` throws on boot in production if `APP_DATABASE_URL` is missing,
-rather than quietly falling back to the owner.
+### …and why you do not have to configure it
+
+That role needs a password, which is a secret, which is normally one more
+thing to set by hand and one more way to get a deployment subtly wrong — and
+the way it goes wrong (pointing it at the owner) has no symptom at all.
+
+So it is derived. The app role's password is an HMAC keyed on the **owner's**
+password, which is already in `DATABASE_URL` wherever this app runs. The build
+applies that value to the role; the running app computes the same value;
+neither stores it. Leave `APP_DATABASE_URL` unset and it is worked out from
+`DATABASE_URL`: same host, same database, different role.
+
+This does not weaken anything. Whoever holds the owner password already has
+unrestricted access to the database, so a credential derived from it grants
+them nothing new — deriving the *greater* credential from the lesser would be
+the mistake, and this is the other way round.
+
+`AUTH_SECRET` is deliberately **not** derived this way. It signs session
+cookies, and keeping it independent of the database password means a leaked
+database credential cannot also be used to forge sessions. It is the one
+variable you have to set.
+
+Set `APP_DATABASE_URL` explicitly if you want the app on a different role or
+host; it always takes precedence. `src/lib/db.ts` throws on boot in production
+if it is neither set nor derivable, rather than quietly falling back to the
+owner.
 
 ## 3. Setup — the build does it
 
-You do not need to run anything by hand. Set the three variables in section 5
-and deploy; `scripts/vercel-build.mjs` runs on Vercel, where the owner
-connection and the database are both already reachable, and it:
+You do not need to run anything by hand. With the Neon integration connected,
+add `AUTH_SECRET` and deploy; `scripts/vercel-build.mjs` runs on Vercel, where
+the owner connection and the database are both already reachable, and it:
 
 1. applies the migrations
 2. creates the `module_risk_app` role if it is missing
-3. sets that role's password to whatever is in `APP_DATABASE_URL` — so
-   rotating the password is "edit the variable, redeploy"
+3. sets that role's password to the derived value (or to whatever
+   `APP_DATABASE_URL` carries, if you set it)
 4. grants it DML only, and no read on `profile.password_hash`
 5. seeds **only if there are no accounts at all**, which can only be true once
 6. connects as the app role and refuses to ship unless an unidentified
@@ -66,7 +92,8 @@ a role created by hand, or a table added by a later migration, still ends up
 with exactly the right privileges.
 
 It also refuses to build if `APP_DATABASE_URL` names the owner role — the one
-misconfiguration that disables row level security with no other symptom.
+misconfiguration that disables row level security with no other symptom — and
+if `AUTH_SECRET` is missing, printing a freshly generated value to paste in.
 
 ### Doing it from a laptop instead
 
@@ -89,8 +116,9 @@ The script:
 1. refuses to run if the database holds tables it does not recognise
 2. applies the migrations
 3. grants `module_risk_app` its privileges
-4. sets that role's password — generated and printed once, unless you pass
-   `APP_DB_PASSWORD`
+4. sets that role's password to the value the app derives, so there is nothing
+   to carry over to Vercel (pass `APP_DB_PASSWORD` to choose your own instead,
+   in which case you must also set `APP_DATABASE_URL`)
 5. seeds the libraries, and the sample assessments if the database is empty
 6. **connects as the app role and proves RLS is on** before telling you it worked
 7. prints the environment variables to paste into Vercel
@@ -114,11 +142,11 @@ Step 3 above grants the privileges, so the hand-created role ends up identical.
 
 - `DIRECT_URL` is filled from `DATABASE_URL_UNPOOLED` when unset — the name the
   Neon integration uses — so its managed variables work untouched.
-- `pgbouncer=true` is added at runtime to any `-pooler` host, so a string
-  pasted straight from Neon behaves.
-- The build **fails** if `APP_DATABASE_URL` is missing, rather than deploying an
-  app that runs as the owner with every policy bypassed. A broken build is
-  easier to notice than a silent security downgrade.
+- `pgbouncer=true` is added, and `channel_binding` removed, for any `-pooler`
+  host, so a string pasted straight from Neon behaves.
+- `APP_DATABASE_URL` is derived from `DATABASE_URL` when unset, so there is no
+  connection string to compose. If it *is* set and names the owner role, the
+  build fails rather than deploying an app with every policy bypassed.
 
 ## 5. Vercel environment variables
 
@@ -126,11 +154,11 @@ Project → Settings → Environment Variables:
 
 | Variable | Value |
 | --- | --- |
-| `DATABASE_URL` | pooled, owner. Often already set by the Neon integration — leave it. |
-| `DIRECT_URL` | unpooled, owner. Optional if `DATABASE_URL_UNPOOLED` exists. |
-| `APP_DATABASE_URL` | pooled host, user `module_risk_app`, **a password you choose**. The build creates the role and applies that password. This is the only one you have to compose. |
-| `AUTH_SECRET` | `openssl rand -base64 32` |
-| `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect |
+| `AUTH_SECRET` | `openssl rand -base64 32`. **The only one you have to set.** |
+| `DATABASE_URL` | pooled, owner. Set by the Neon integration — leave it. |
+| `DIRECT_URL` | unpooled, owner. Not needed if `DATABASE_URL_UNPOOLED` exists, which the integration also sets. |
+| `APP_DATABASE_URL` | Optional. Derived from `DATABASE_URL` when unset. |
+| `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect. Only needed for photo evidence. |
 
 A deploy applies any new migration before the new code serves.
 
@@ -154,7 +182,10 @@ database by the setup script.
 
 ## 7. Before real data goes in
 
-- Rotate `neondb_owner`'s password if it has ever been pasted anywhere.
+- Rotate `neondb_owner`'s password if it has ever been pasted anywhere. Note
+  that this also rotates the derived app-role password: redeploy afterwards so
+  the build applies the new one. (If it has been pasted somewhere, rotate it
+  regardless — that is what rotation is for.)
 - Remove the demo accounts from `prisma/seed.ts`, or change `SEED_PASSWORD`.
   All six share one password.
 - `AUTH_SECRET` must not be the development placeholder.
