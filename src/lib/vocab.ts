@@ -51,7 +51,7 @@ export type AssessmentStatus = (typeof ASSESSMENT_STATUSES)[number];
 
 /**
  * Status metadata. Risk owns colour; status owns shape and weight. This is
- * what keeps the register from becoming a rainbow — see docs/design-plan.md.
+ * what keeps the register from becoming a rainbow — see DESIGN.md.
  */
 export const STATUS_META: Record<
   AssessmentStatus,

@@ -3,34 +3,40 @@
 /* ==================================================================
  * module-risk — design tokens.
  *
- * The visual language comes from the subject, not from SaaS: poolside
- * ceramic tile grids, stencilled depth numerals, ISO 7010 signage, the
- * cool light of a pool hall. Cool, clean, institutional, slightly
- * clinical.
+ * The visual language comes from the subject, not from SaaS: the duty
+ * manager's board at reception. Ruled grids, stencilled numerals,
+ * capacity notices, ISO 7010 signage — the things in a leisure centre
+ * that have to be read at a glance, in bad light, by someone walking
+ * past. Cool, clean, institutional.
+ *
+ * A centre is a pool AND a sports hall AND studios AND changing rooms
+ * AND plant rooms AND soft play AND outdoor pitches. Nothing here may
+ * belong to only one of them.
  *
  * Everything is OKLCH. The neutrals sit on one cool hue (~200) so the
- * greys read as water rather than as generic slate, and the risk ramp
- * steps evenly — an sRGB ramp goes muddy through the middle.
+ * greys read as painted concrete and steel rather than as generic
+ * slate, and the risk ramp steps evenly — an sRGB ramp goes muddy
+ * through the middle.
  *
  * Two colour systems that must never mix:
- *   brand (--accent, chlorine teal) — links, primary actions, focus
- *   risk  (--risk-1..5)            — severity, and nothing else
+ *   brand (--accent, wayfinding teal) — links, primary actions, focus
+ *   risk  (--risk-1..5)              — severity, and nothing else
  * ================================================================== */
 
 @theme {
   /* ---- neutrals -------------------------------------------------- */
   /* Never pure #000 for text, never pure #FFF for the page. */
-  --color-ink: oklch(0.196 0.017 208); /* deep cool near-black — water at depth */
+  --color-ink: oklch(0.196 0.017 208); /* deep cool near-black — board slate */
   --color-ink-soft: oklch(0.4 0.014 208);
   --color-muted: oklch(0.535 0.012 200); /* AA on --surface at 4.69:1 */
   --color-faint: oklch(0.68 0.01 200);
-  --color-surface: oklch(0.968 0.004 168); /* cool off-white — tile grout */
+  --color-surface: oklch(0.968 0.004 168); /* cool off-white — painted wall */
   --color-surface-raised: oklch(1 0 0); /* the only white, and only as a plane */
   --color-surface-sunk: oklch(0.945 0.005 180);
   --color-rule: oklch(0.884 0.006 175); /* hairlines */
   --color-rule-strong: oklch(0.82 0.008 180);
 
-  /* ---- brand — chlorine teal ------------------------------------- */
+  /* ---- brand — wayfinding teal ------------------------------------ */
   --color-accent: oklch(0.512 0.083 201.5);
   --color-accent-ink: oklch(0.43 0.07 201.5);
   --color-accent-wash: oklch(0.938 0.021 197);
@@ -39,7 +45,7 @@
   /* ---- risk — a separate semantic scale, never the brand colour ---
    * Lightness descends monotonically in 0.06 steps and chroma ascends,
    * so the ramp survives a greyscale printout: an inspector can tell a
-   * 20 from a 6 with no colour at all. See docs/design-plan.md for why
+   * 20 from a 6 with no colour at all. See DESIGN.md for why
    * this departs from the brief's literal hexes.
    *
    *   --risk-N       tile fill
@@ -221,8 +227,10 @@
   max-width: var(--spacing-measure);
 }
 
-/* Grout: the 2px gap that makes a grid read as tile rather than as table. */
-@utility grout {
+/* Ruled: the 2px gap in the rule colour that makes a grid read as a ruled
+ * board rather than as a table. Named for --color-rule, which shows through
+ * as the lines between cells. */
+@utility ruled {
   gap: 2px;
   background-color: var(--color-rule);
   padding: 2px;

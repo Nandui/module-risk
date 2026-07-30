@@ -23,7 +23,7 @@ export interface MatrixValue {
 /**
  * The risk matrix, rendered as poolside tile.
  *
- * Square corners against an otherwise softly-rounded interface, 2px grout
+ * Square corners against an otherwise softly-rounded interface, 2px ruled
  * gaps in the rule colour, stencilled numerals. You tap into a cell — there
  * are no dropdowns. The selected cell physically raises.
  *
@@ -125,7 +125,7 @@ export function TileMatrix({
             aria-readonly={disabled || undefined}
             tabIndex={-1}
             onKeyDown={onKeyDown}
-            className="grid grout grid-cols-[1.5rem_repeat(5,minmax(0,1fr))]"
+            className="grid ruled grid-cols-[1.5rem_repeat(5,minmax(0,1fr))]"
           >
             {MATRIX.map((row) => {
               const likelihood = row[0]!.likelihood;
@@ -246,7 +246,7 @@ export function TileMatrixStatic({
 }) {
   return (
     <div
-      className={cn("grid grout w-fit grid-cols-5 print-keep", className)}
+      className={cn("grid ruled w-fit grid-cols-5 print-keep", className)}
       role="img"
       aria-label={describeCell(value.likelihood, value.severity)}
     >
@@ -290,7 +290,7 @@ export function TileMatrixHeat({
   const total = Object.values(counts).reduce((n, v) => n + v, 0);
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="grid grout grid-cols-5" role="img"
+      <div className="grid ruled grid-cols-5" role="img"
         aria-label={`Distribution of ${total} findings across the risk matrix.`}>
         {MATRIX.map((row) =>
           row.map((cell) => {

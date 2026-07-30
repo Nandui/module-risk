@@ -81,6 +81,15 @@ Confirmed and built:
   sentence rather than a constraint violation.
 - Content carried from the `riskly` module of the Centrely suite, written
   against a real operation: 59 hazards, 105 control measures, 11 templates.
+- Two further controlled vocabularies, also carried from that module because
+  they sharpen cross-centre reporting: `finding.persons_at_risk`
+  (Staff | Customers | Children | Contractors | Visitors) and a category on
+  both `hazard` and `control_measure` (Physical | Chemical | Biological |
+  Ergonomic | Psychosocial | Environmental).
+- The printed band key states the band **thresholds**, not the scores that
+  happen to occur. Only products of two 1–5 ratings are reachable, so no
+  finding is ever 13, 14 or 19 — but the key has to survive an inspector
+  checking the arithmetic.
 - Photo evidence, server-rendered PDF, per-centre and cross-centre reporting.
 
 Open decisions — record, do not invent:
@@ -116,8 +125,9 @@ Open decisions — record, do not invent:
 - The original build brief:
   `/root/.claude/uploads/…/df9e44b6-riskassessmentappbrief.md` (outside the
   repo; not durable).
-- `docs/design-plan.md` — palette, type scale, layout, signature element, and
-  the places the build departs from the brief, with reasons.
+- `DESIGN.md` and `.impeccable/design.json` — the visual system: tokens,
+  type roles, layout, the signature matrix, and the named rules that govern
+  them. Supersedes the earlier `docs/design-plan.md`.
 - Seeded sample data: 3 invented centres, 9 assessments, 58 findings, 12
   actions. **Synthetic.** Not a real operator's data and must never be
   presented as one.

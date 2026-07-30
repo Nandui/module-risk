@@ -13,8 +13,10 @@ real operation. Free-text hazard and control fields have been lifted into
 controlled library rows, because prose cannot be compared across centres and
 cross-centre comparison is the entire value of this product to a group.
 
-See [`docs/design-plan.md`](docs/design-plan.md) for the palette, type scale,
-layout and signature element, and for the places this departs from the brief.
+See [`DESIGN.md`](DESIGN.md) for the visual system — palette, type scale,
+layout, the signature matrix, and the named rules that govern them — and
+[`PRODUCT.md`](PRODUCT.md) for the product record: users, jurisdiction,
+accessibility duty, and what must never be invented.
 
 ---
 

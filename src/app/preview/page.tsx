@@ -37,7 +37,7 @@ export default function PreviewPage() {
         {/* ---- the matrix ---------------------------------------- */}
         <Section
           title="Risk matrix"
-          note="Square corners, 2px grout gaps, stencilled numerals. Tap a cell — arrow keys walk the grid, Enter commits."
+          note="Square corners, 2px ruled gaps, stencilled numerals. Tap a cell — arrow keys walk the grid, Enter commits."
         >
           <div className="grid gap-10 lg:grid-cols-[minmax(0,26rem)_1fr]">
             <MatrixPlayground />

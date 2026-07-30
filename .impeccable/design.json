@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-30T00:00:00Z",
+  "title": "Design System: Risk register",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Wayfinding Teal",
+        "canonical": "oklch(0.512 0.083 201.5)",
+        "tonalRamp": [
+          "oklch(0.15 0.083 201.5)",
+          "oklch(0.26 0.083 201.5)",
+          "oklch(0.37 0.083 201.5)",
+          "oklch(0.48 0.083 201.5)",
+          "oklch(0.59 0.083 201.5)",
+          "oklch(0.70 0.083 201.5)",
+          "oklch(0.82 0.083 201.5)",
+          "oklch(0.95 0.083 201.5)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Board Slate",
+        "canonical": "oklch(0.196 0.017 208)",
+        "tonalRamp": [
+          "oklch(0.15 0.017 208)",
+          "oklch(0.26 0.017 208)",
+          "oklch(0.37 0.017 208)",
+          "oklch(0.48 0.017 208)",
+          "oklch(0.59 0.017 208)",
+          "oklch(0.70 0.017 208)",
+          "oklch(0.82 0.017 208)",
+          "oklch(0.95 0.017 208)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Painted Wall",
+        "canonical": "oklch(0.968 0.004 168)",
+        "tonalRamp": [
+          "oklch(0.15 0.004 168)",
+          "oklch(0.26 0.004 168)",
+          "oklch(0.37 0.004 168)",
+          "oklch(0.48 0.004 168)",
+          "oklch(0.59 0.004 168)",
+          "oklch(0.70 0.004 168)",
+          "oklch(0.82 0.004 168)",
+          "oklch(0.95 0.004 168)"
+        ]
+      },
+      "risk-1": {
+        "role": "secondary",
+        "displayName": "Band 1 — Clear",
+        "canonical": "oklch(0.8 0.07 157)",
+        "tonalRamp": [
+          "oklch(0.15 0.07 157)",
+          "oklch(0.26 0.07 157)",
+          "oklch(0.37 0.07 157)",
+          "oklch(0.48 0.07 157)",
+          "oklch(0.59 0.07 157)",
+          "oklch(0.70 0.07 157)",
+          "oklch(0.82 0.07 157)",
+          "oklch(0.95 0.07 157)"
+        ]
+      },
+      "risk-2": {
+        "role": "secondary",
+        "displayName": "Band 2 — Watch",
+        "canonical": "oklch(0.74 0.0875 125)",
+        "tonalRamp": [
+          "oklch(0.15 0.0875 125)",
+          "oklch(0.26 0.0875 125)",
+          "oklch(0.37 0.0875 125)",
+          "oklch(0.48 0.0875 125)",
+          "oklch(0.59 0.0875 125)",
+          "oklch(0.70 0.0875 125)",
+          "oklch(0.82 0.0875 125)",
+          "oklch(0.95 0.0875 125)"
+        ]
+      },
+      "risk-3": {
+        "role": "secondary",
+        "displayName": "Band 3 — Act",
+        "canonical": "oklch(0.68 0.105 93)",
+        "tonalRamp": [
+          "oklch(0.15 0.105 93)",
+          "oklch(0.26 0.105 93)",
+          "oklch(0.37 0.105 93)",
+          "oklch(0.48 0.105 93)",
+          "oklch(0.59 0.105 93)",
+          "oklch(0.70 0.105 93)",
+          "oklch(0.82 0.105 93)",
+          "oklch(0.95 0.105 93)"
+        ]
+      },
+      "risk-4": {
+        "role": "secondary",
+        "displayName": "Band 4 — Escalate",
+        "canonical": "oklch(0.62 0.1225 61)",
+        "tonalRamp": [
+          "oklch(0.15 0.1225 61)",
+          "oklch(0.26 0.1225 61)",
+          "oklch(0.37 0.1225 61)",
+          "oklch(0.48 0.1225 61)",
+          "oklch(0.59 0.1225 61)",
+          "oklch(0.70 0.1225 61)",
+          "oklch(0.82 0.1225 61)",
+          "oklch(0.95 0.1225 61)"
+        ]
+      },
+      "risk-5": {
+        "role": "secondary",
+        "displayName": "Band 5 — Stop",
+        "canonical": "oklch(0.56 0.14 29)",
+        "tonalRamp": [
+          "oklch(0.15 0.14 29)",
+          "oklch(0.26 0.14 29)",
+          "oklch(0.37 0.14 29)",
+          "oklch(0.48 0.14 29)",
+          "oklch(0.59 0.14 29)",
+          "oklch(0.70 0.14 29)",
+          "oklch(0.82 0.14 29)",
+          "oklch(0.95 0.14 29)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Report headline numbers and the sign-in wordmark. One per view at most."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Page titles."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Sheet headings, document section headings, empty states."
+      },
+      "ui-lg": {
+        "displayName": "UI Large",
+        "purpose": "The authoring flow. A step up from the default because it is read at arm's length on a tablet."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "The interface default."
+      },
+      "ui-sm": {
+        "displayName": "UI Small",
+        "purpose": "Register rows, chips, field labels."
+      },
+      "data-xs": {
+        "displayName": "Data XS",
+        "purpose": "References, dates, coordinates. Tabular figures forced globally."
+      },
+      "eyebrow": {
+        "displayName": "Eyebrow",
+        "purpose": "Small-caps labels: metadata terms, matrix axis labels, section markers."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tile-lift",
+        "value": "0 3px 0 0 var(--color-ink)",
+        "purpose": "The only lift in the system. Selected matrix cell, paired with a 2px inset ink ring. Hard and zero-blur on purpose: a tile pushed proud of the board, not a floating card."
+      },
+      {
+        "name": "sheet-scrim",
+        "value": "background-color: color-mix(in oklab, var(--color-ink) 25%, transparent)",
+        "purpose": "Flat ink scrim behind a sheet. Not a blur, not a shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-settle",
+        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "purpose": "The only easing curve. Exponential-feeling settle, no overshoot."
+      },
+      {
+        "name": "duration-quick",
+        "value": "120ms",
+        "purpose": "State changes: hover, focus, colour shifts."
+      },
+      {
+        "name": "duration-settle",
+        "value": "240ms",
+        "purpose": "Sheet entrance, view transitions, the autosave indicator."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main affirmative action on a screen. One per view.",
+      "html": "<button class=\"ds-btn-primary\">Save finding</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.25rem; padding: 0 0.875rem; border: none; border-radius: 0.5rem; background: var(--color-accent, oklch(0.512 0.083 201.5)); color: #fff; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; line-height: 1.5; white-space: nowrap; cursor: pointer; transition: background-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-btn-primary:hover { background: var(--color-accent-ink, oklch(0.43 0.07 201.5)); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ink Button (terminal action)",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "Irreversible actions — sign-off above all. Heavier than a primary action, and deliberately does not look like one.",
+      "html": "<button class=\"ds-btn-ink\">Sign off assessment</button>",
+      "css": ".ds-btn-ink { display: inline-flex; align-items: center; justify-content: center; height: 2.25rem; padding: 0 0.875rem; border: none; border-radius: 0.5rem; background: var(--color-ink, oklch(0.196 0.017 208)); color: var(--color-surface-raised, #fff); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-btn-ink:hover { background: var(--color-ink-soft, oklch(0.4 0.014 208)); } .ds-btn-ink:focus-visible { outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button (default)",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "The default variant. Most buttons in this product are not the main action.",
+      "html": "<button class=\"ds-btn-outline\">Add hazard</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; height: 2.25rem; padding: 0 0.875rem; border: 1px solid var(--color-rule-strong, oklch(0.82 0.008 180)); border-radius: 0.5rem; background: var(--color-surface-raised, #fff); color: var(--color-ink, oklch(0.196 0.017 208)); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-btn-outline:hover { background: var(--color-surface-sunk, oklch(0.945 0.005 180)); } .ds-btn-outline:focus-visible { outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Site-walk Input",
+      "kind": "input",
+      "refersTo": "input-lg",
+      "description": "The authoring density: 3rem tall, 16px text. Sized for one-handed tablet use during a site walk.",
+      "html": "<label class=\"ds-label\" for=\"ds-i1\">Notes</label><input class=\"ds-input-lg\" id=\"ds-i1\" placeholder=\"What did you observe?\" />",
+      "css": ".ds-label { display: block; margin-bottom: 0.375rem; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: var(--color-ink-soft, oklch(0.4 0.014 208)); } .ds-input-lg { width: 100%; height: 3rem; padding: 0 0.875rem; border: 1px solid var(--color-rule-strong, oklch(0.82 0.008 180)); border-radius: 0.5rem; background: var(--color-surface-raised, #fff); color: var(--color-ink, oklch(0.196 0.017 208)); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 1rem; line-height: 1.55; transition: border-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-input-lg::placeholder { color: var(--color-faint, oklch(0.68 0.01 200)); } .ds-input-lg:focus { border-color: var(--color-accent, oklch(0.512 0.083 201.5)); outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 0; }"
+    },
+    {
+      "name": "Neutral Chip",
+      "kind": "chip",
+      "refersTo": "chip-neutral",
+      "description": "Nearly square (3px) so it never reads as a risk tile. Risk owns colour; everything else stays neutral.",
+      "html": "<span class=\"ds-chip\">Signed off</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.375rem; border-radius: 3px; background: var(--color-surface-sunk, oklch(0.945 0.005 180)); color: var(--color-ink-soft, oklch(0.4 0.014 208)); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.2; }"
+    },
+    {
+      "name": "Rail Item",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Navigation rail item. Active state is a 2px teal bar inset at the left edge — the only persistent use of the accent as a marker.",
+      "html": "<a class=\"ds-rail-item ds-rail-item--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M3 9h18M9 21V9\"/></svg>Register</a>",
+      "css": ".ds-rail-item { position: relative; display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.625rem; border-radius: 0.5rem; color: var(--color-ink-soft, oklch(0.4 0.014 208)); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; text-decoration: none; transition: background-color 120ms cubic-bezier(0.32,0.72,0,1); } .ds-rail-item:hover { background: var(--color-surface-sunk, oklch(0.945 0.005 180)); color: var(--color-ink, oklch(0.196 0.017 208)); } .ds-rail-item--active { background: var(--color-surface-sunk, oklch(0.945 0.005 180)); color: var(--color-ink, oklch(0.196 0.017 208)); } .ds-rail-item--active::before { content: \"\"; position: absolute; left: -0.5rem; top: 0.375rem; bottom: 0.375rem; width: 2px; background: var(--color-accent, oklch(0.512 0.083 201.5)); }"
+    },
+    {
+      "name": "Tile Chip",
+      "kind": "custom",
+      "refersTo": "tile-band-5",
+      "description": "The matrix carried into the register and the PDF: square band tile with the score numeral, plus the L×S coordinate in the data role. Colour and numeral, never colour alone.",
+      "html": "<span class=\"ds-tile-chip\"><span class=\"ds-tile ds-tile--5\">20</span><span class=\"ds-tile-coord\">4×5</span></span>",
+      "css": ".ds-tile-chip { display: inline-flex; align-items: center; gap: 0.375rem; vertical-align: middle; } .ds-tile { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 0; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-weight: 700; font-stretch: 125%; font-variation-settings: \"wdth\" 125; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; font-size: 0.8125rem; } .ds-tile--5 { background: var(--color-risk-5, oklch(0.56 0.14 29)); color: #fff; } .ds-tile-coord { font-family: \"Geist Mono\", ui-monospace, SFMono-Regular, monospace; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--color-muted, oklch(0.535 0.012 200)); }"
+    },
+    {
+      "name": "Matrix Cell (selected)",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The one earned lift in the system: 3px rise on a hard zero-blur ink shadow with an inset ink ring. A tile pushed proud of the board.",
+      "html": "<div class=\"ds-matrix\"><button class=\"ds-cell ds-cell--3\">9</button><button class=\"ds-cell ds-cell--4\">12</button><button class=\"ds-cell ds-cell--4 ds-cell--selected\">16</button><button class=\"ds-cell ds-cell--5\">20</button></div>",
+      "css": ".ds-matrix { display: grid; grid-template-columns: repeat(4, 3rem); gap: 2px; padding: 2px; background: var(--color-rule, oklch(0.884 0.006 175)); width: fit-content; } .ds-cell { position: relative; display: grid; place-items: center; aspect-ratio: 1; border: none; border-radius: 0; opacity: 0.7; cursor: pointer; color: var(--color-ink, oklch(0.196 0.017 208)); font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-weight: 700; font-stretch: 125%; font-variation-settings: \"wdth\" 125; font-variant-numeric: tabular-nums; font-size: 0.875rem; transition: transform 120ms cubic-bezier(0.32,0.72,0,1), box-shadow 120ms cubic-bezier(0.32,0.72,0,1), opacity 120ms cubic-bezier(0.32,0.72,0,1); } .ds-cell:hover { opacity: 1; } .ds-cell--3 { background: var(--color-risk-3, oklch(0.68 0.105 93)); } .ds-cell--4 { background: var(--color-risk-4, oklch(0.62 0.1225 61)); } .ds-cell--5 { background: var(--color-risk-5, oklch(0.56 0.14 29)); color: #fff; } .ds-cell--selected { z-index: 1; opacity: 1; transform: translateY(-3px); box-shadow: 0 3px 0 0 var(--color-ink, oklch(0.196 0.017 208)), inset 0 0 0 2px var(--color-ink, oklch(0.196 0.017 208)); } .ds-cell:focus-visible { outline: 2px solid var(--color-accent, oklch(0.512 0.083 201.5)); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Duty Manager's Board",
+    "overview": "The board at reception in a leisure centre: capacity notices, plant readings, chalked times, statutory signage, a ruled grid with numbers written into it. Things that have to be read at a glance, in bad light, by someone walking past who has thirty seconds. That is the register, the assessment document and the exported PDF, and it is why this system is built out of ruled grids, stencilled numerals and signage colour rather than out of cards and gradients.\n\nA centre is a pool and a sports hall and studios and changing rooms and plant rooms and soft play and outdoor pitches. No motif here may belong to only one of them. The world is the building's shared administrative language, not any single room's material.\n\nThe register is cool, institutional and unhurried. It is not clinical and it is not friendly. Its confidence comes from precision — hairlines that land on the pixel, numerals that align down a column, a colour ramp that survives a fax machine — rather than from expression. Someone reading this a year later is usually reading it because something went wrong.",
+    "keyCharacteristics": [
+      "Ruled grids and hairlines, never cards, and never a card inside a card",
+      "Stencilled numerals in an expanded display face; the number is the object",
+      "Two colour systems that never mix: wayfinding teal for interface, the risk ramp for severity",
+      "Flat by default, with exactly one earned lift",
+      "Density is per-job: the register is tight, the site-walk form is generous"
+    ],
+    "rules": [
+      {
+        "name": "The Two Scales Rule",
+        "body": "Wayfinding teal and the risk ramp are separate systems and may never be substituted for one another. Teal never encodes severity; a risk colour never marks a link, a button or a focus ring. A screen where the two are confusable is a defect, not a style choice.",
+        "section": "colors"
+      },
+      {
+        "name": "The Greyscale Rule",
+        "body": "The ramp descends in lightness by ~0.06 per step while chroma ascends, so it survives a monochrome printout: an inspector can tell a 20 from a 6 with no colour at all. Any new colour added to the ramp must hold that property, and must be checked as a greyscale render, not by eye.",
+        "section": "colors"
+      },
+      {
+        "name": "The Never-Colour-Alone Rule",
+        "body": "Risk level is always carried by the numeral and the band word as well as the fill. No state in this product may be readable only by hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signage Crossover Rule",
+        "body": "Text on a band fill is dark on bands 1–4 and white on band 5, at 4.98:1 — the same crossover ISO 7010 makes between a black-on-yellow warning and a white-on-red prohibition. The crossover point is a contrast measurement, not a preference.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Anything a reader might compare down a column is set in the data role with tnum on. A reference number or a date in the sans face is a bug — the columns will not align, and misaligned figures in a safety record read as carelessness.",
+        "section": "typography"
+      },
+      {
+        "name": "The Width Axis Rule",
+        "body": "The display face is only the display face at width 125. Shipping Archivo at its default width is a failure to use the type, not a neutral fallback.",
+        "section": "typography"
+      },
+      {
+        "name": "The Measure Rule",
+        "body": "Document and report prose is capped at 68ch. The register is exempt: a table is scanned in columns, not read in lines.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Lift Rule",
+        "body": "Exactly one element in this system rises off the surface, and it is the selected matrix cell. A second one devalues the first. If a new element seems to need elevation, it needs a hairline or a tone step instead.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep wayfinding teal and the risk ramp completely separate. If a screen makes them confusable, that is a defect.",
+      "Do carry risk level in the numeral and the band word as well as the fill, every time.",
+      "Do check any new ramp colour as a greyscale render before accepting it.",
+      "Do set anything comparable down a column in the data role with tabular figures.",
+      "Do use the 3rem control size throughout the authoring flow. It exists for one-handed tablet use on a site walk.",
+      "Do keep the register full-bleed. Horizontal room buys a column, and the columns are the product.",
+      "Do treat the print stylesheet as product surface. The PDF is what an inspector reads, and it is rendered from this CSS by headless Chromium.",
+      "Do ship the display face at width axis 125."
+    ],
+    "donts": [
+      "Don't add a second element that lifts off the surface. One is the whole budget, and it belongs to the selected matrix cell.",
+      "Don't round the matrix cells or the tile chips. The squareness is what separates danger data from interface.",
+      "Don't reach for a card, and never nest one.",
+      "Don't use a risk colour on a control, except the danger button, whose meaning genuinely is severity.",
+      "Don't replace the matrix with two dropdowns, however much simpler the form would be.",
+      "Don't let faint carry content. It is for placeholders and disabled text only.",
+      "Don't ship the display face at its default width.",
+      "Don't introduce a motif that belongs to only one room of the building. A centre is a pool and a hall and studios and changing rooms and plant rooms and soft play and outdoor pitches.",
+      "Don't animate on scroll, bounce, or stagger. Motion is a 120ms state change or a 240ms settle, and everything collapses under prefers-reduced-motion.",
+      "Don't give status its own colour system. Status is shape and weight; colour belongs to risk.",
+      "Don't add a KPI row or a grid of donuts to reports. Three figures, one comparison table, one trend line.",
+      "Don't route to a full page for assessment detail. It opens as a deep-linkable right sheet so the manager never loses their place in the register."
+    ]
+  }
+}
