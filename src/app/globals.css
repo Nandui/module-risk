@@ -129,6 +129,13 @@
   --text-figure--line-height: 1;
   --text-figure--letter-spacing: -0.03em;
 
+  /* Signage. One numeral per view, at the scale of a capacity notice or a
+   * depth marker — read from across a room, not from a chair. Reserved for
+   * the single figure a screen is actually about. */
+  --text-signage: 4.5rem;
+  --text-signage--line-height: 0.9;
+  --text-signage--letter-spacing: -0.04em;
+
   /* ---- geometry ---------------------------------------------------
    * The interface is softly rounded; the matrix is deliberately square. */
   --radius: 0.5rem;

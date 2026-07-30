@@ -21,6 +21,7 @@ const FONT_SIZES = [
   "title-sm",
   "title",
   "figure",
+  "signage",
 ] as const;
 
 const merge = extendTailwindMerge({

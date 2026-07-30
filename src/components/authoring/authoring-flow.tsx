@@ -293,7 +293,7 @@ export function AuthoringFlow({
                   <span
                     aria-hidden
                     className={cn(
-                      "grid size-5 shrink-0 place-items-center font-mono text-[0.625rem]",
+                      "grid size-5 shrink-0 place-items-center font-mono text-stencil-xs",
                       isComplete(draft)
                         ? "bg-accent text-white"
                         : "bg-surface-sunk text-muted",
@@ -313,7 +313,7 @@ export function AuthoringFlow({
                     <span
                       aria-hidden
                       className={cn(
-                        "grid size-5 shrink-0 place-items-center stencil text-[0.625rem]",
+                        "grid size-5 shrink-0 place-items-center stencil text-stencil-xs",
                         bandMeta(score).fill,
                       )}
                     >

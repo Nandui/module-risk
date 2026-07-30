@@ -80,7 +80,7 @@ function OwnerGroup({ group }: { group: Group }) {
         <span
           aria-hidden
           className={cn(
-            "grid size-6 shrink-0 place-items-center rounded-full font-mono text-[0.625rem]",
+            "grid size-6 shrink-0 place-items-center rounded-full font-mono text-stencil-xs",
             group.ownerId
               ? "bg-accent-wash text-accent-ink"
               : "border border-dashed border-rule-strong text-muted",

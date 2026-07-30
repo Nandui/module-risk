@@ -123,7 +123,7 @@ export function BandBadge({
         className,
       )}
     >
-      <span className={cn("grid size-4 shrink-0 place-items-center stencil text-[0.625rem]", meta.fill)}>
+      <span className={cn("grid size-4 shrink-0 place-items-center stencil text-stencil-xs", meta.fill)}>
         {band}
       </span>
       {meta.label}
@@ -145,7 +145,7 @@ export function BandKey({ className }: { className?: string }) {
           <span key={band} className="inline-flex items-center gap-1.5 text-ui-sm">
             <span
               className={cn(
-                "grid size-4 shrink-0 place-items-center stencil text-[0.625rem]",
+                "grid size-4 shrink-0 place-items-center stencil text-stencil-xs",
                 meta.fill,
               )}
             >

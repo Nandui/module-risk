@@ -161,6 +161,10 @@
       "stencil-xs": {
         "displayName": "Stencil XS",
         "purpose": "The numeral or code inside a small square tile — band numbers, centre codes. Only ever inside a tile."
+      },
+      "signage": {
+        "displayName": "Signage",
+        "purpose": "The single numeral a screen is about, at capacity-notice scale. One per view, only inside a band-coloured block."
       }
     },
     "shadows": [
@@ -328,6 +332,11 @@
         "name": "The Legible Floor Rule",
         "body": "Every text tone in this system clears 4.5:1 on every surface it can land on. If a design needs something quieter than muted, the answer is less text, smaller text, or more space — never a lighter grey.",
         "section": "colors"
+      },
+      {
+        "name": "The One Numeral Rule",
+        "body": "Exactly one figure per view may take the signage step, and it must sit inside a band-coloured block. A second one turns a statement into a dashboard.",
+        "section": "typography"
       }
     ],
     "dos": [
@@ -351,8 +360,10 @@
       "Don't introduce a motif that belongs to only one room of the building. A centre is a pool and a hall and studios and changing rooms and plant rooms and soft play and outdoor pitches.",
       "Don't animate on scroll, bounce, or stagger. Motion is a 120ms state change or a 240ms settle, and everything collapses under prefers-reduced-motion.",
       "Don't give status its own colour system. Status is shape and weight; colour belongs to risk.",
-      "Don't add a KPI row or a grid of donuts to reports. Three figures, one comparison table, one trend line.",
-      "Don't route to a full page for assessment detail. It opens as a deep-linkable right sheet so the manager never loses their place in the register."
+      "Don't add a KPI row or a grid of donuts to reports. One verdict, one comparison, one trend, one distribution.",
+      "Don't route to a full page for assessment detail. It opens as a deep-linkable right sheet so the manager never loses their place in the register.",
+      "Don't print the same figure twice on one screen. If it belongs in the masthead it does not also belong in a footer list.",
+      "Don't chart a number that has no shape. Three data points belong in a table."
     ]
   }
 }

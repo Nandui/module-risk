@@ -4,12 +4,12 @@ import { FileDown } from "lucide-react";
 import { requireSession } from "@/lib/data/session";
 import { getReportData } from "@/lib/data/reports";
 import { PageHeader } from "@/components/shell/page-header";
+import { SeverityTrend } from "@/components/reports/report-charts";
 import {
-  HighRiskActionsByCentre,
-  OverdueByCentre,
-  SeverityTrend,
-} from "@/components/reports/report-charts";
-import { ComparisonTable } from "@/components/reports/comparison-table";
+  CentreStack,
+  ComparisonTable,
+} from "@/components/reports/comparison-table";
+import { VerdictMasthead } from "@/components/reports/verdict-masthead";
 import { TileMatrixHeat } from "@/components/risk/tile-matrix";
 import { BandKey } from "@/components/risk/tile-chip";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,16 @@ import { formatDateTime } from "@/lib/utils";
 export const metadata: Metadata = { title: "Reports" };
 
 /**
- * The Report job. Three figures, one comparison table, one trend line.
+ * The Report job, composed as signage rather than as a dashboard.
  *
- * Optimised for defensibility: every number on this page can be traced to a
- * signed record, and the PDF is the artefact an inspector actually reads.
+ * One verdict, one comparison, one trend, one distribution — in that order,
+ * each with room around it. The previous layout opened with three equal metric
+ * cards over three near-empty charts and closed with five more figures, two of
+ * which restated numbers from the top of the page. Twelve numbers competed and
+ * none led.
+ *
+ * Optimised for defensibility: every number here traces to a signed record,
+ * and the PDF is the artefact an inspector actually reads.
  */
 export default async function ReportsPage() {
   const session = await requireSession();
@@ -43,58 +49,77 @@ export default async function ReportsPage() {
         }
       />
 
-      <div className="space-y-10 px-4 py-6 sm:px-6">
-        {/* ---- the three figures ---------------------------------- */}
-        <section className="grid gap-4 lg:grid-cols-3">
-          <OverdueByCentre centres={data.centres} />
-          <HighRiskActionsByCentre centres={data.centres} />
+      {/* The answer, before any of the evidence for it. */}
+      <VerdictMasthead centres={data.centres} totals={data.totals} />
+
+      <div className="space-y-16 px-4 py-12 sm:px-6">
+        {/* ---- the focal element ---------------------------------- */}
+        <section aria-labelledby="comparison" className="space-y-4">
+          <div>
+            <h2
+              id="comparison"
+              className="font-display text-title font-bold tracking-tight text-ink"
+            >
+              Every centre, side by side
+            </h2>
+            <p className="mt-1.5 max-w-measure text-ui text-muted">
+              Comparable because hazards and controls come from one shared
+              library. Free-text records could not be lined up like this — it is
+              the reason the vocabulary is controlled.
+            </p>
+          </div>
+          {/* One of these is display:none, so only one is in the a11y tree. */}
+          <div className="hidden lg:block">
+            <ComparisonTable centres={data.centres} />
+          </div>
+          <CentreStack centres={data.centres} className="lg:hidden" />
+        </section>
+
+        {/* ---- the one series with a shape ------------------------ */}
+        <section aria-labelledby="trend" className="max-w-3xl space-y-4">
+          <div>
+            <h2
+              id="trend"
+              className="font-display text-title-sm font-bold tracking-tight text-ink"
+            >
+              Mean residual risk, twelve months
+            </h2>
+            <p className="mt-1.5 text-ui text-muted">
+              Across every finding on an assessment signed off up to that month.
+            </p>
+          </div>
           <SeverityTrend trend={data.trend} />
         </section>
 
-        {/* ---- the comparison table ------------------------------- */}
-        <section className="space-y-3">
-          <div>
-            <h2 className="eyebrow">Cross-centre comparison</h2>
-            <p className="mt-1 text-ui text-muted">
-              Comparable because hazards and controls come from one shared
-              library. Free-text records could not be lined up like this.
-            </p>
-          </div>
-          <ComparisonTable centres={data.centres} />
-        </section>
-
-        {/* ---- where risk clusters -------------------------------- */}
-        <section className="grid gap-6 lg:grid-cols-[auto_1fr] lg:items-start">
-          <div className="space-y-3">
+        {/* ---- the signature -------------------------------------- */}
+        <section
+          aria-labelledby="distribution"
+          className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start lg:gap-12"
+        >
+          <div className="space-y-4">
             <div>
-              <h2 className="eyebrow">Where residual risk sits</h2>
-              <p className="mt-1 max-w-prose text-ui text-muted">
-                Every finding at its matrix position, after controls.
+              <h2
+                id="distribution"
+                className="font-display text-title-sm font-bold tracking-tight text-ink"
+              >
+                Where residual risk sits
+              </h2>
+              <p className="mt-1.5 text-ui text-muted">
+                Every finding at its matrix position, after controls. Severity
+                climbs to the right, likelihood upward.
               </p>
             </div>
-            <div className="max-w-xs">
-              <TileMatrixHeat counts={data.matrixCounts} />
-            </div>
+            <TileMatrixHeat counts={data.matrixCounts} />
           </div>
 
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-5 border-l-0 lg:border-l lg:border-rule lg:pl-8">
-            <Stat label="Assessments" value={data.totals.assessments} />
-            <Stat label="Signed off" value={data.totals.signedOff} />
-            <Stat label="Findings recorded" value={data.totals.findings} />
-            <Stat
-              label="Overdue reviews"
-              value={data.totals.overdue}
-              emphasis={data.totals.overdue > 0}
-            />
-            <Stat
-              label="Open high-risk actions"
-              value={data.totals.openHighRiskActions}
-              emphasis={data.totals.openHighRiskActions > 0}
-            />
-          </dl>
+          <p className="max-w-measure text-ui text-muted lg:pt-1">
+            A cluster low and left is a well-controlled operation. Anything in
+            the top-right corner is a finding whose controls have not moved it,
+            and is the first thing an inspector will ask about.
+          </p>
         </section>
 
-        <footer className="space-y-3 border-t border-rule pt-4">
+        <footer className="space-y-3 border-t border-rule pt-5">
           <BandKey />
           <p className="font-mono text-data-xs text-muted">
             Generated {formatDateTime(data.generatedAt)} · Risk score is
@@ -103,30 +128,5 @@ export default async function ReportsPage() {
         </footer>
       </div>
     </>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  emphasis,
-}: {
-  label: string;
-  value: number;
-  emphasis?: boolean;
-}) {
-  return (
-    <div>
-      <dt className="eyebrow">{label}</dt>
-      <dd
-        className={
-          emphasis
-            ? "mt-1 stencil text-title text-risk-5-ink"
-            : "mt-1 stencil text-title text-ink"
-        }
-      >
-        {value}
-      </dd>
-    </div>
   );
 }

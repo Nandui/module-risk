@@ -30,6 +30,13 @@ colors:
   risk-5-ink: "oklch(0.41 0.15 29)"
   risk-5-wash: "oklch(0.925 0.036 29)"
 typography:
+  signage:
+    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "4.5rem"
+    fontWeight: 700
+    lineHeight: 0.9
+    letterSpacing: "-0.04em"
+    fontVariation: "wdth 125"
   figure:
     fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.75rem"
@@ -270,6 +277,9 @@ explains, mono measures.
 
 ### Hierarchy
 
+- **Signage** (`{typography.signage}`): The single numeral a screen is about,
+  at the scale of a capacity notice — read from across a room, not from a
+  chair. Strictly one per view, and only inside a band-coloured block.
 - **Figure** (`{typography.figure}`): Report headline numbers and the sign-in
   wordmark. One per view at most.
 - **Title** (`{typography.title}`): Page titles.
@@ -355,6 +365,10 @@ through the scrim, and far short of glass.
 surface, and it is the selected matrix cell. A second one devalues the first.
 If a new element seems to need elevation, it needs a hairline or a tone step
 instead.
+
+**The One Numeral Rule.** Exactly one figure per view may take the signage
+step, and it must sit inside a band-coloured block. A second one turns a
+statement into a dashboard.
 
 **The Legible Floor Rule.** Every text tone in this system clears 4.5:1 on
 every surface it can land on. If a design needs something quieter than
@@ -457,9 +471,24 @@ system has.
 ### Charts
 
 Hairline-ruled, no gridline fill, no legend where a direct label will do.
-Reports carry three figures, one comparison table and one trend line — not a
-KPI row and a grid of donuts. Every chart has a print variant, because the
-figure an inspector sees is the printed one.
+
+**One chart on the reports screen, not three.** Two bar charts were removed
+because each plotted one or two bars against a 0–4 axis and restated a column
+the comparison table already carries per centre. A chart holding three numbers
+is a decoration of a number, and on a page an inspector reads, decoration
+costs credibility. What survives is the only series with a shape: mean
+residual over twelve months.
+
+Every chart has a print variant, because the figure an inspector sees is the
+printed one.
+
+### The Verdict Masthead
+
+The reports screen opens with the answer, not the evidence: a band-coloured
+block carrying the group's worst residual at signage scale, one plain sentence
+naming the centre, and the group's four standing figures demoted beneath it.
+Each of those figures appears exactly once on the page — the layout it
+replaced printed two of them twice.
 
 ### The Tile Matrix (signature)
 
@@ -526,8 +555,12 @@ reading a number.
   `prefers-reduced-motion`.
 - **Don't** give status its own colour system. Status is shape and weight;
   colour belongs to risk.
-- **Don't** add a KPI row or a grid of donuts to reports. Three figures, one
-  comparison table, one trend line.
+- **Don't** add a KPI row or a grid of donuts to reports. One verdict, one
+  comparison, one trend, one distribution.
+- **Don't** print the same figure twice on one screen. If it belongs in the
+  masthead it does not also belong in a footer list.
+- **Don't** chart a number that has no shape. Three data points belong in a
+  table.
 - **Don't** route to a full page for assessment detail. It opens as a
   deep-linkable right sheet so the manager never loses their place in the
   register.
