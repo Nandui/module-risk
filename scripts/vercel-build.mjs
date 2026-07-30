@@ -10,7 +10,6 @@
  * Everything here is idempotent. It creates and grants; it never drops.
  */
 import { execFileSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
 import pg from "pg";
 import {
   APP_ROLE,
@@ -86,10 +85,11 @@ if (!env.APP_DATABASE_URL) {
 if (!env.AUTH_SECRET) {
   fatal(
     "AUTH_SECRET is not set. Auth.js cannot sign session cookies without it.\n\n" +
-      "  Add it in Vercel → Settings → Environment Variables and redeploy. Here is\n" +
-      "  a freshly generated value you can paste straight in:\n\n" +
-      `      ${randomBytes(32).toString("base64")}\n\n` +
-      "  It is the only variable this project needs you to set by hand.",
+      "  Generate one and add it in Vercel → Settings → Environment Variables:\n\n" +
+      "      openssl rand -base64 32\n\n" +
+      "  It is the only variable this project needs you to set by hand.\n\n" +
+      "  (Deliberately not generated and printed here: a build log is a bad place\n" +
+      "  for a secret to first exist, and logs get shared.)",
   );
 }
 
@@ -108,10 +108,11 @@ run("npx", ["prisma", "migrate", "deploy"]);
 
 // ---- provision the application role --------------------------------
 // The migration creates the role when the owner has CREATEROLE, but it cannot
-// set a password (nothing secret belongs in a committed migration). The
-// password lives in APP_DATABASE_URL, which only exists here — so this is
-// where the two are reconciled. Rotating the Vercel variable and redeploying
-// is therefore all a password change takes.
+// set a password: nothing secret belongs in a committed migration, and the
+// derived value depends on a connection string the migration cannot see. So
+// the password is applied here, where the owner connection exists — and it is
+// applied on every deploy, so it converges rather than needing to be kept in
+// step by hand.
 console.log(
   `\n[build] provisioning the application role (${
     derivedApp ? "derived from DATABASE_URL" : "from APP_DATABASE_URL"
