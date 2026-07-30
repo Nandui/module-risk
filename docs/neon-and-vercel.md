@@ -46,9 +46,32 @@ So the app connects as `module_risk_app`, which has:
 `src/lib/db.ts` throws on boot in production if `APP_DATABASE_URL` is missing,
 rather than quietly falling back to the owner.
 
-## 3. Running the setup
+## 3. Setup — the build does it
 
-From a machine that can reach Neon on port 5432:
+You do not need to run anything by hand. Set the three variables in section 5
+and deploy; `scripts/vercel-build.mjs` runs on Vercel, where the owner
+connection and the database are both already reachable, and it:
+
+1. applies the migrations
+2. creates the `module_risk_app` role if it is missing
+3. sets that role's password to whatever is in `APP_DATABASE_URL` — so
+   rotating the password is "edit the variable, redeploy"
+4. grants it DML only, and no read on `profile.password_hash`
+5. seeds **only if there are no accounts at all**, which can only be true once
+6. connects as the app role and refuses to ship unless an unidentified
+   connection reads nothing
+
+It is idempotent and never drops anything. Steps 2–4 re-run on every deploy, so
+a role created by hand, or a table added by a later migration, still ends up
+with exactly the right privileges.
+
+It also refuses to build if `APP_DATABASE_URL` names the owner role — the one
+misconfiguration that disables row level security with no other symptom.
+
+### Doing it from a laptop instead
+
+If you would rather set the database up before the first deploy, from a machine
+that can reach Neon on port 5432:
 
 ```bash
 git clone <this repo> && cd module-risk && npm install
@@ -87,19 +110,15 @@ role. The setup script then tells you so. Recover with:
 
 Step 3 above grants the privileges, so the hand-created role ends up identical.
 
-## 4. What the build does for you
+## 4. Variable names you do not have to fix
 
-`vercel.json` runs `scripts/vercel-build.mjs`, which:
-
-- fills `DIRECT_URL` from `DATABASE_URL_UNPOOLED` if you have not set it — the
-  name the Neon integration uses — so its managed variables work untouched
-- **fails the build if `APP_DATABASE_URL` is missing**, rather than letting the
-  app deploy running as the database owner with every policy bypassed. A broken
-  build is easier to notice than a silent security downgrade.
-- then runs `prisma generate`, `prisma migrate deploy`, `next build`
-
-At runtime, `pgbouncer=true` is added automatically to any `-pooler` host, so a
-connection string pasted straight from Neon behaves.
+- `DIRECT_URL` is filled from `DATABASE_URL_UNPOOLED` when unset — the name the
+  Neon integration uses — so its managed variables work untouched.
+- `pgbouncer=true` is added at runtime to any `-pooler` host, so a string
+  pasted straight from Neon behaves.
+- The build **fails** if `APP_DATABASE_URL` is missing, rather than deploying an
+  app that runs as the owner with every policy bypassed. A broken build is
+  easier to notice than a silent security downgrade.
 
 ## 5. Vercel environment variables
 
@@ -109,7 +128,7 @@ Project → Settings → Environment Variables:
 | --- | --- |
 | `DATABASE_URL` | pooled, owner. Often already set by the Neon integration — leave it. |
 | `DIRECT_URL` | unpooled, owner. Optional if `DATABASE_URL_UNPOOLED` exists. |
-| `APP_DATABASE_URL` | pooled, `module_risk_app`. **You must set this**; the build fails without it. |
+| `APP_DATABASE_URL` | pooled host, user `module_risk_app`, **a password you choose**. The build creates the role and applies that password. This is the only one you have to compose. |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `BLOB_READ_WRITE_TOKEN` | Storage → Blob → connect |
 
