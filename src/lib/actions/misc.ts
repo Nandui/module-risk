@@ -83,6 +83,57 @@ export async function signIn(formData: FormData): Promise<ActionResult> {
   return { ok: true };
 }
 
+/**
+ * Development-only one-click sign-in.
+ *
+ * Three guards, because this is a credential bypass and hiding the button is
+ * not a control:
+ *
+ *  1. It refuses outright unless NODE_ENV is development. A production build
+ *     that somehow reached this code path throws rather than authenticating.
+ *  2. The email must be one of the three seeded demo accounts. Without the
+ *     allowlist this would be "sign in as anyone whose address you can guess".
+ *  3. The password stays on the server. It is never sent to the client, so it
+ *     cannot end up in the bundle even in development.
+ *
+ * Delete this function and its component when the demo accounts go.
+ */
+const DEV_ACCOUNTS = [
+  "lead@example.com",
+  "manager@example.com",
+  "assessor@example.com",
+] as const;
+
+export async function devSignIn(formData: FormData): Promise<void> {
+  if (process.env.NODE_ENV !== "development") {
+    throw new Error("devSignIn is available in development only.");
+  }
+
+  const email = String(formData.get("email") ?? "");
+  if (!DEV_ACCOUNTS.includes(email as (typeof DEV_ACCOUNTS)[number])) {
+    throw new Error(`devSignIn refused an account outside the demo set: ${email}`);
+  }
+
+  try {
+    await authSignIn("credentials", {
+      email,
+      password: process.env.SEED_PASSWORD ?? "risk-demo-1234",
+      redirectTo: "/register",
+    });
+  } catch (error) {
+    // Success redirects by throwing NEXT_REDIRECT, so an AuthError here means
+    // the demo accounts are genuinely absent. Thrown rather than returned: a
+    // plain <form action> cannot carry a result back, and in development the
+    // error overlay is the right place for this to land.
+    if (error instanceof AuthError) {
+      throw new Error(
+        "The demo accounts are not in this database. Run `npm run db:local` to seed them.",
+      );
+    }
+    throw error;
+  }
+}
+
 export async function signOut(): Promise<void> {
   await authSignOut({ redirectTo: "/sign-in" as Route });
 }

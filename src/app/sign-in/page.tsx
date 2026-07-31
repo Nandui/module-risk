@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SignInForm } from "@/components/auth/sign-in-form";
+import { DevSignIn } from "@/components/auth/dev-sign-in";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -55,6 +56,7 @@ export default async function SignInPage({
           </p>
 
           <SignInForm next={next} />
+          <DevSignIn />
         </div>
       </div>
     </div>
