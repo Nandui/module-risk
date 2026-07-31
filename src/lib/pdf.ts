@@ -79,13 +79,19 @@ export async function renderPdf({
     await page.evaluateHandle("document.fonts.ready");
     await page.emulateMediaType("print");
 
+    // Chromium renders header and footer templates outside the page's CSS
+    // context, so the footer cannot reference a token and has to carry a
+    // literal. Kept in step with --color-muted's print value by hand.
+    // impeccable-disable-next-line design-system-color -- outside page CSS
+    const FOOTER_INK = "#77726b";
+
     const pdf = await page.pdf({
       ...A4,
       displayHeaderFooter: true,
       headerTemplate: "<span></span>",
       footerTemplate: `
         <div style="width:100%;padding:0 14mm;font-family:ui-monospace,monospace;
-                    font-size:7pt;color:#667070;display:flex;
+                    font-size:7pt;color:${FOOTER_INK};display:flex;
                     justify-content:space-between;">
           <span>${escapeHtml(footerLeft)}</span>
           <span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>

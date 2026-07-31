@@ -117,7 +117,7 @@ export function LibraryBrowser({
                   )
                 }
                 className={cn(
-                  "rounded-[3px] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+                  "rounded-[var(--radius-sm)] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
                   active
                     ? "border-ink bg-ink text-surface-raised"
                     : "border-rule-strong bg-surface-raised text-muted hover:text-ink",
@@ -134,7 +134,7 @@ export function LibraryBrowser({
               aria-pressed={pendingOnly}
               onClick={() => setPendingOnly((v) => !v)}
               className={cn(
-                "rounded-[3px] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+                "rounded-[var(--radius-sm)] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
                 pendingOnly
                   ? "border-accent bg-accent text-white"
                   : "border-accent-line bg-accent-wash text-accent-ink",
@@ -169,7 +169,7 @@ export function LibraryBrowser({
                 </span>
                 <span
                   className={cn(
-                    "shrink-0 rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                    "shrink-0 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                     CATEGORY_META[hazard.category].chip,
                   )}
                 >
@@ -196,7 +196,7 @@ export function LibraryBrowser({
               <span className="min-w-0 flex-1 text-ui text-ink">{control.label}</span>
               <span
                 className={cn(
-                  "shrink-0 rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                  "shrink-0 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                   CATEGORY_META[control.category].chip,
                 )}
               >
@@ -225,7 +225,7 @@ export function LibraryBrowser({
               </span>
               <span
                 className={cn(
-                  "shrink-0 rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                  "shrink-0 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                   CATEGORY_META[template.category].chip,
                 )}
               >
@@ -253,7 +253,7 @@ function ReviewControls({
 
   if (!canReview) {
     return (
-      <span className="shrink-0 rounded-[3px] border border-accent-line bg-accent-wash px-1.5 py-0.5 text-ui-sm leading-tight text-accent-ink">
+      <span className="shrink-0 rounded-[var(--radius-sm)] border border-accent-line bg-accent-wash px-1.5 py-0.5 text-ui-sm leading-tight text-accent-ink">
         Awaiting review
       </span>
     );

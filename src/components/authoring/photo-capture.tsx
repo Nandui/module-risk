@@ -90,7 +90,7 @@ export function PhotoCapture({
                 type="button"
                 onClick={() => remove(url)}
                 aria-label="Remove this photo"
-                className="absolute right-1 top-1 grid size-6 place-items-center rounded-[3px] bg-surface-raised/90 text-ink-soft hover:text-risk-5-ink"
+                className="absolute right-1 top-1 grid size-6 place-items-center rounded-[var(--radius-sm)] bg-surface-raised/90 text-ink-soft hover:text-risk-5-ink"
               >
                 <Trash2 aria-hidden className="size-3.5" />
               </button>

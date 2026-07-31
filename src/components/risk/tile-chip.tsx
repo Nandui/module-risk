@@ -37,7 +37,7 @@ export function TileChip({
           // Square corners: this is a tile, not a badge.
           "grid shrink-0 place-items-center stencil",
           meta.fill,
-          size === "sm" ? "size-5 text-data-xs" : "size-7 text-ui-sm",
+          size === "sm" ? "size-4 text-stencil-xs" : "size-6 text-data-xs",
         )}
       >
         {score}
@@ -118,7 +118,7 @@ export function BandBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-[3px] px-1.5 py-0.5 text-ui-sm",
+        "inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm",
         meta.chip,
         className,
       )}

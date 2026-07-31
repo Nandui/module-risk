@@ -115,7 +115,7 @@ function Option({
       type="button"
       onClick={onSelect}
       aria-current={selected || undefined}
-      className="flex w-full items-center gap-2.5 rounded-[3px] px-2 py-1.5 text-left transition-colors duration-[var(--duration-quick)] hover:bg-surface-sunk"
+      className="flex w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-2 py-1.5 text-left transition-colors duration-[var(--duration-quick)] hover:bg-surface-sunk"
     >
       <span
         aria-hidden

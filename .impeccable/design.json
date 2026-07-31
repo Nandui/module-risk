@@ -6,47 +6,62 @@
     "colorMeta": {
       "accent": {
         "role": "primary",
-        "displayName": "Wayfinding Teal",
-        "canonical": "oklch(0.512 0.083 201.5)",
+        "displayName": "Indigo",
+        "canonical": "oklch(0.505 0.15 277)",
         "tonalRamp": [
-          "oklch(0.15 0.083 201.5)",
-          "oklch(0.26 0.083 201.5)",
-          "oklch(0.37 0.083 201.5)",
-          "oklch(0.48 0.083 201.5)",
-          "oklch(0.59 0.083 201.5)",
-          "oklch(0.70 0.083 201.5)",
-          "oklch(0.82 0.083 201.5)",
-          "oklch(0.95 0.083 201.5)"
+          "oklch(0.15 0.15 277)",
+          "oklch(0.26 0.15 277)",
+          "oklch(0.37 0.15 277)",
+          "oklch(0.48 0.15 277)",
+          "oklch(0.59 0.15 277)",
+          "oklch(0.70 0.15 277)",
+          "oklch(0.82 0.15 277)",
+          "oklch(0.95 0.15 277)"
+        ]
+      },
+      "accent-solid": {
+        "role": "primary",
+        "displayName": "Indigo Solid",
+        "canonical": "oklch(0.52 0.16 277)",
+        "tonalRamp": [
+          "oklch(0.15 0.16 277)",
+          "oklch(0.26 0.16 277)",
+          "oklch(0.37 0.16 277)",
+          "oklch(0.48 0.16 277)",
+          "oklch(0.59 0.16 277)",
+          "oklch(0.70 0.16 277)",
+          "oklch(0.82 0.16 277)",
+          "oklch(0.95 0.16 277)"
         ]
       },
       "ink": {
         "role": "neutral",
-        "displayName": "Board Slate",
-        "canonical": "oklch(0.196 0.017 208)",
+        "displayName": "Ink",
+        "canonical": "oklch(0.235 0.008 75)",
         "tonalRamp": [
-          "oklch(0.15 0.017 208)",
-          "oklch(0.26 0.017 208)",
-          "oklch(0.37 0.017 208)",
-          "oklch(0.48 0.017 208)",
-          "oklch(0.59 0.017 208)",
-          "oklch(0.70 0.017 208)",
-          "oklch(0.82 0.017 208)",
-          "oklch(0.95 0.017 208)"
+          "oklch(0.15 0.008 75)",
+          "oklch(0.26 0.008 75)",
+          "oklch(0.37 0.008 75)",
+          "oklch(0.48 0.008 75)",
+          "oklch(0.59 0.008 75)",
+          "oklch(0.70 0.008 75)",
+          "oklch(0.82 0.008 75)",
+          "oklch(0.95 0.008 75)"
         ]
       },
       "surface": {
         "role": "neutral",
-        "displayName": "Painted Wall",
-        "canonical": "oklch(0.968 0.004 168)",
+        "displayName": "Warm Canvas",
+        "canonical": "oklch(0.98 0.0035 85)",
         "tonalRamp": [
-          "oklch(0.15 0.004 168)",
-          "oklch(0.26 0.004 168)",
-          "oklch(0.37 0.004 168)",
-          "oklch(0.48 0.004 168)",
-          "oklch(0.59 0.004 168)",
-          "oklch(0.70 0.004 168)",
-          "oklch(0.82 0.004 168)",
-          "oklch(0.95 0.004 168)"
+          "oklch(0.15 0.0035 85)",
+          "oklch(0.26 0.0035 85)",
+          "oklch(0.37 0.0035 85)",
+          "oklch(0.48 0.0035 85)",
+          "oklch(0.59 0.0035 85)",
+          "oklch(0.70 0.0035 85)",
+          "oklch(0.82 0.0035 85)",
+          "oklch(0.95 0.0035 85)"
         ]
       },
       "risk-1": {
@@ -126,9 +141,13 @@
       }
     },
     "typographyMeta": {
+      "signage": {
+        "displayName": "Signage",
+        "purpose": "The single numeral a screen is about. One per view, inside a band-coloured block."
+      },
       "figure": {
         "displayName": "Figure",
-        "purpose": "Report headline numbers and the sign-in wordmark. One per view at most."
+        "purpose": "Report headline numbers."
       },
       "title": {
         "displayName": "Title",
@@ -136,19 +155,23 @@
       },
       "title-sm": {
         "displayName": "Title Small",
-        "purpose": "Sheet headings, document section headings, empty states."
+        "purpose": "Sheet and section headings."
       },
       "ui-lg": {
         "displayName": "UI Large",
-        "purpose": "The authoring flow. A step up from the default because it is read at arm's length on a tablet."
+        "purpose": "The site-walk form, read at arm's length on a tablet."
       },
       "ui": {
         "displayName": "UI",
-        "purpose": "The interface default."
+        "purpose": "The default, 13px."
       },
       "ui-sm": {
         "displayName": "UI Small",
-        "purpose": "Register rows, chips, field labels."
+        "purpose": "Dense rows, chips."
+      },
+      "stencil-xs": {
+        "displayName": "Stencil XS",
+        "purpose": "The numeral inside a small tile."
       },
       "data-xs": {
         "displayName": "Data XS",
@@ -156,44 +179,36 @@
       },
       "eyebrow": {
         "displayName": "Eyebrow",
-        "purpose": "Small-caps labels: metadata terms, matrix axis labels, section markers."
-      },
-      "stencil-xs": {
-        "displayName": "Stencil XS",
-        "purpose": "The numeral or code inside a small square tile — band numbers, centre codes. Only ever inside a tile."
-      },
-      "signage": {
-        "displayName": "Signage",
-        "purpose": "The single numeral a screen is about, at capacity-notice scale. One per view, only inside a band-coloured block."
+        "purpose": "Column heads, metadata terms, section labels. Quiet, not letterspaced small caps."
       }
     },
     "shadows": [
       {
         "name": "tile-lift",
         "value": "0 3px 0 0 var(--color-ink)",
-        "purpose": "The only lift in the system. Selected matrix cell, paired with a 2px inset ink ring. Hard and zero-blur on purpose: a tile pushed proud of the board, not a floating card."
+        "purpose": "The only lift in the system. Selected matrix cell, with an inset ink ring. Hard and zero-blur: a tile pushed proud of the board, not a floating card."
       },
       {
         "name": "sheet-scrim",
         "value": "background-color: color-mix(in oklab, var(--color-ink) 25%, transparent)",
-        "purpose": "Flat ink scrim behind a sheet. Not a blur, not a shadow."
+        "purpose": "Flat ink scrim behind a side panel. Not a blur, not a shadow."
       }
     ],
     "motion": [
       {
         "name": "ease-settle",
-        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
-        "purpose": "The only easing curve. Exponential-feeling settle, no overshoot."
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The only easing curve. Exponential ease-out, no overshoot, never ease-in."
       },
       {
         "name": "duration-quick",
-        "value": "120ms",
-        "purpose": "State changes: hover, focus, colour shifts."
+        "value": "110ms",
+        "purpose": "State changes: hover, focus, colour shifts, press."
       },
       {
         "name": "duration-settle",
-        "value": "240ms",
-        "purpose": "Sheet entrance, view transitions, the autosave indicator."
+        "value": "180ms",
+        "purpose": "Side-panel entrance, view transitions."
       }
     ],
     "breakpoints": [
@@ -278,7 +293,7 @@
     }
   ],
   "narrative": {
-    "northStar": "The Duty Manager's Board",
+    "northStar": "The Operating System for a Safety Team",
     "overview": "The board at reception in a leisure centre: capacity notices, plant readings, chalked times, statutory signage, a ruled grid with numbers written into it. Things that have to be read at a glance, in bad light, by someone walking past who has thirty seconds. That is the register, the assessment document and the exported PDF, and it is why this system is built out of ruled grids, stencilled numerals and signage colour rather than out of cards and gradients.\n\nA centre is a pool and a sports hall and studios and changing rooms and plant rooms and soft play and outdoor pitches. No motif here may belong to only one of them. The world is the building's shared administrative language, not any single room's material.\n\nThe register is cool, institutional and unhurried. It is not clinical and it is not friendly. Its confidence comes from precision — hairlines that land on the pixel, numerals that align down a column, a colour ramp that survives a fax machine — rather than from expression. Someone reading this a year later is usually reading it because something went wrong.",
     "keyCharacteristics": [
       "Ruled grids and hairlines, never cards, and never a card inside a card",

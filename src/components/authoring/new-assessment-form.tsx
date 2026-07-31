@@ -109,7 +109,7 @@ export function NewAssessmentForm({
                     </span>
                     <span
                       className={cn(
-                        "rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                        "rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                         CATEGORY_META[option.category].chip,
                       )}
                     >

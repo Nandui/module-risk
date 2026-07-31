@@ -112,9 +112,13 @@ Open decisions — record, do not invent:
   suite. This ships as its own application on the same stack, so a developer
   moves between the two without relearning anything. It is not a module inside
   Centrely's runtime.
-- Typography pinned by the original brief: **Archivo Expanded** for display,
-  **Geist Sans** for interface, **Geist Mono** for data. A saturated-pattern
-  warning against Geist does not override this; the brief wins.
+- Typography: **Geist Sans** for everything, **Geist Mono** for data. The
+  original brief pinned Archivo Expanded as a display face; the client
+  released that constraint when the interface was rebuilt against a Linear /
+  Attio / Vercel reference, and a separate display voice fragments the page at
+  13px base. Geist is Vercel's own face, so it is a considered choice rather
+  than a default — the saturation warning against it does not override a
+  reference set that names Vercel.
 - Voice: plain, specific, unhedged. Error messages say what happened and what to
   do — "This assessment is signed off, so it can no longer be edited. Create a
   revision to record a correction." No exclamation marks, no apology, no

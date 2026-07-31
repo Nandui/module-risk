@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
  * Inputs. Two densities: `md` for the register's filter row, `lg` for the
  * authoring form, where an assessor is tapping on a tablet.
  *
+ * The fill is the recessed tone rather than the raised one: an input receives
+ * content, so it should read as set into the surface, not floating on it. It
+ * lifts to the raised tone on focus.
+ *
  * Every field is labelled. Errors are wired with aria-describedby and
  * aria-invalid rather than being a red sentence floating near a box.
  */
@@ -25,11 +29,11 @@ export const Label = React.forwardRef<
 Label.displayName = "Label";
 
 const fieldBase =
-  "w-full rounded-[var(--radius)] border border-rule-strong bg-surface-raised text-ink placeholder:text-muted transition-colors duration-[var(--duration-quick)] hover:border-rule-strong focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent aria-[invalid=true]:border-risk-5 disabled:bg-surface-sunk disabled:text-muted";
+  "w-full rounded-[var(--radius)] border border-rule bg-surface-sunk text-ink placeholder:text-muted transition-colors duration-[var(--duration-quick)] hover:border-rule-strong focus:border-accent focus:bg-surface-raised focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent aria-[invalid=true]:border-risk-5 disabled:opacity-60";
 
 const sizes = {
-  md: "h-9 px-2.5 text-ui",
-  lg: "h-12 px-3.5 text-ui-lg",
+  md: "h-8 px-2.5 text-ui",
+  lg: "h-10 px-3 text-ui-lg",
 } as const;
 
 export interface InputProps extends Omit<React.ComponentProps<"input">, "size"> {

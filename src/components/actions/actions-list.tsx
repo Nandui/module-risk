@@ -45,7 +45,7 @@ export function ActionsList({
           onClick={() => setMineOnly((v) => !v)}
           aria-pressed={mineOnly}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-[3px] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+            "inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
             mineOnly
               ? "border-ink bg-ink text-surface-raised"
               : "border-rule-strong bg-surface-raised text-muted hover:text-ink",
@@ -170,7 +170,7 @@ function ActionRow({ row }: { row: ActionListRow }) {
           </p>
           <span
             className={cn(
-              "mt-0.5 inline-block rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+              "mt-0.5 inline-block rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
               meta.chip,
             )}
           >

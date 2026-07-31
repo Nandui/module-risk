@@ -13,7 +13,7 @@ export function Chip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+        "inline-flex min-h-6 items-center gap-1 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
         className,
       )}
       {...props}

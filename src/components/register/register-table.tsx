@@ -180,7 +180,7 @@ export function RegisterTable({
           return (
             <span
               className={cn(
-                "inline-block rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                "inline-block rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                 meta.chip,
               )}
             >
@@ -288,7 +288,7 @@ export function RegisterTable({
                             ? "descending"
                             : "none"
                       }
-                      className="sticky top-0 z-20 border-b border-rule bg-surface-raised px-2.5 py-2 text-left align-bottom whitespace-nowrap"
+                      className="sticky top-0 z-20 border-b border-rule bg-surface-raised px-2.5 py-1.5 text-left align-bottom whitespace-nowrap"
                     >
                       <button
                         type="button"
@@ -334,7 +334,7 @@ export function RegisterTable({
                     <td
                       key={cell.id}
                       className={cn(
-                        "border-b border-rule px-2.5 py-2 align-middle",
+                        "border-b border-rule px-2.5 py-1.5 align-middle",
                         // Overdue is marked by a left edge-rule: visually
                         // distinct without being alarming, and it survives a
                         // greyscale printout.

@@ -53,7 +53,7 @@ export function HazardTypeahead({
         {selected ? (
           <span
             className={cn(
-              "shrink-0 rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+              "shrink-0 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
               CATEGORY_META[selected.category].chip,
             )}
           >
@@ -101,7 +101,7 @@ export function HazardTypeahead({
                       setQuery("");
                     }}
                     className={cn(
-                      "flex cursor-pointer flex-col gap-0.5 rounded-[3px] px-2 py-2 data-[selected=true]:bg-surface-sunk",
+                      "flex cursor-pointer flex-col gap-0.5 rounded-[var(--radius-sm)] px-2 py-2 data-[selected=true]:bg-surface-sunk",
                       used && "cursor-not-allowed opacity-45",
                     )}
                   >
@@ -130,7 +130,7 @@ export function HazardTypeahead({
                   setOpen(false);
                   onProposeNew(query);
                 }}
-                className="flex w-full items-center gap-2 rounded-[3px] px-2 py-2 text-left text-ui-sm text-accent-ink hover:bg-accent-wash"
+                className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-2 py-2 text-left text-ui-sm text-accent-ink hover:bg-accent-wash"
               >
                 <Plus aria-hidden className="size-3.5 shrink-0" />
                 <span className="flex-1">

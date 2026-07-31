@@ -136,7 +136,7 @@ export default function PreviewPage() {
                     <p className={cn("text-ui-sm", meta.ink)}>Band ink</p>
                     <p
                       className={cn(
-                        "rounded-[3px] px-1.5 py-0.5 text-center text-ui-sm",
+                        "rounded-[var(--radius-sm)] px-1.5 py-0.5 text-center text-ui-sm",
                         meta.chip,
                       )}
                     >
@@ -247,7 +247,7 @@ export default function PreviewPage() {
                 <span
                   key={status}
                   className={cn(
-                    "inline-block rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                    "inline-block rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                     STATUS_META[status].chip,
                   )}
                 >
@@ -260,7 +260,7 @@ export default function PreviewPage() {
                 <span
                   key={category}
                   className={cn(
-                    "inline-block rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                    "inline-block rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                     CATEGORY_META[category].chip,
                   )}
                 >

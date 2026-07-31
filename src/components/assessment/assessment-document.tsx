@@ -85,7 +85,7 @@ export function AssessmentDocument({
           <Meta label="Status" mono={false}>
             <span
               className={cn(
-                "inline-block rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                "inline-block rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                 status.chip,
               )}
             >
@@ -191,7 +191,7 @@ export function AssessmentDocument({
                       </span>
                       <span
                         className={cn(
-                          "rounded-[3px] px-1.5 py-0.5 text-ui-sm leading-tight",
+                          "rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm leading-tight",
                           CATEGORY_META[finding.hazardCategory].chip,
                         )}
                       >

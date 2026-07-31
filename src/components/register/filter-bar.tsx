@@ -204,7 +204,7 @@ export function FilterBar({
               aria-pressed={active}
               title={`${meta.label} · ${meta.range}`}
               className={cn(
-                "inline-flex min-h-6 items-center gap-1.5 rounded-[3px] border px-1.5 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+                "inline-flex min-h-6 items-center gap-1.5 rounded-[var(--radius-sm)] border px-1.5 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
                 active
                   ? "border-ink bg-surface-raised text-ink"
                   : "border-rule-strong text-muted hover:text-ink",
@@ -281,7 +281,7 @@ export function FilterBar({
                 onFiltersChange(view.filters);
                 onQueryChange(view.query);
               }}
-              className="inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.5 text-ui-sm text-accent-ink hover:bg-accent-wash"
+              className="inline-flex items-center gap-1 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm text-accent-ink hover:bg-accent-wash"
             >
               <Bookmark aria-hidden className="size-3" />
               {view.name}
@@ -290,7 +290,7 @@ export function FilterBar({
               type="button"
               onClick={() => persist(views.filter((v) => v.name !== view.name))}
               aria-label={`Delete the ${view.name} view`}
-              className="grid size-5 place-items-center rounded-[3px] text-muted hover:text-risk-5-ink"
+              className="grid size-5 place-items-center rounded-[var(--radius-sm)] text-muted hover:text-risk-5-ink"
             >
               <X aria-hidden className="size-3" />
             </button>
@@ -301,7 +301,7 @@ export function FilterBar({
           <button
             type="button"
             onClick={saveCurrent}
-            className="inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.5 text-ui-sm text-muted hover:bg-surface-sunk hover:text-ink"
+            className="inline-flex items-center gap-1 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-ui-sm text-muted hover:bg-surface-sunk hover:text-ink"
           >
             <BookmarkPlus aria-hidden className="size-3" />
             Save this view
@@ -327,7 +327,7 @@ function FilterChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "inline-flex min-h-6 items-center gap-1.5 rounded-[3px] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
+        "inline-flex min-h-6 items-center gap-1.5 rounded-[var(--radius-sm)] border px-2 py-0.5 text-ui-sm transition-colors duration-[var(--duration-quick)]",
         active
           ? "border-ink bg-ink text-surface-raised"
           : "border-rule-strong bg-surface-raised text-muted hover:text-ink",

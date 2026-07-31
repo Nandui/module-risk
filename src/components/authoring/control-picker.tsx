@@ -103,7 +103,7 @@ export function ControlPicker({
                   <span
                     aria-hidden
                     className={cn(
-                      "grid size-5 shrink-0 place-items-center rounded-[3px] border transition-colors duration-[var(--duration-quick)]",
+                      "grid size-5 shrink-0 place-items-center rounded-[var(--radius-sm)] border transition-colors duration-[var(--duration-quick)]",
                       isSelected
                         ? "border-accent bg-accent text-white"
                         : "border-rule-strong bg-surface-raised",

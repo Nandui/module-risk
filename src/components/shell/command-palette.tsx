@@ -82,7 +82,7 @@ export function CommandPalette({
         {compact ? null : (
           <>
             <span className="flex-1 text-left">Jump to…</span>
-            <kbd className="rounded-[3px] border border-rule bg-surface-raised px-1 font-mono text-[0.6875rem] text-muted">
+            <kbd className="rounded-[var(--radius-sm)] border border-rule bg-surface-raised px-1 font-mono text-[0.6875rem] text-muted">
               ⌘K
             </kbd>
           </>
@@ -130,7 +130,7 @@ export function CommandPalette({
                         key={`${item.kind}-${item.id}`}
                         value={`${item.label} ${item.reference ?? ""} ${item.detail ?? ""}`}
                         onSelect={() => go(item.href)}
-                        className="flex cursor-pointer items-center gap-2.5 rounded-[3px] px-2 py-1.5 text-ui data-[selected=true]:bg-surface-sunk"
+                        className="flex cursor-pointer items-center gap-2.5 rounded-[var(--radius-sm)] px-2 py-1.5 text-ui data-[selected=true]:bg-surface-sunk"
                       >
                         {item.score ? (
                           <span

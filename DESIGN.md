@@ -2,565 +2,483 @@
 name: Risk register
 description: Health and safety risk assessments across a leisure centre group.
 colors:
-  ink: "oklch(0.196 0.017 208)"
-  ink-soft: "oklch(0.4 0.014 208)"
-  muted: "oklch(0.52 0.012 200)"
-  surface: "oklch(0.968 0.004 168)"
+  ink: "oklch(0.235 0.008 75)"
+  ink-soft: "oklch(0.44 0.008 75)"
+  muted: "oklch(0.525 0.008 78)"
+  surface: "oklch(0.98 0.0035 85)"
   surface-raised: "oklch(1 0 0)"
-  surface-sunk: "oklch(0.945 0.005 180)"
-  rule: "oklch(0.884 0.006 175)"
-  rule-strong: "oklch(0.82 0.008 180)"
-  accent: "oklch(0.512 0.083 201.5)"
-  accent-ink: "oklch(0.43 0.07 201.5)"
-  accent-wash: "oklch(0.938 0.021 197)"
-  accent-line: "oklch(0.8 0.045 200)"
+  surface-sunk: "oklch(0.955 0.005 85)"
+  rule: "oklch(0.905 0.005 85)"
+  rule-strong: "oklch(0.855 0.006 85)"
+  accent: "oklch(0.505 0.15 277)"
+  accent-ink: "oklch(0.44 0.14 277)"
+  accent-solid: "oklch(0.52 0.16 277)"
+  accent-wash: "oklch(0.955 0.022 277)"
+  accent-line: "oklch(0.82 0.06 277)"
   risk-1: "oklch(0.8 0.07 157)"
   risk-1-ink: "oklch(0.47 0.085 157)"
-  risk-1-wash: "oklch(0.945 0.028 157)"
+  risk-1-wash: "oklch(0.955 0.026 157)"
   risk-2: "oklch(0.74 0.0875 125)"
   risk-2-ink: "oklch(0.455 0.098 125)"
-  risk-2-wash: "oklch(0.94 0.034 125)"
+  risk-2-wash: "oklch(0.95 0.032 125)"
   risk-3: "oklch(0.68 0.105 93)"
   risk-3-ink: "oklch(0.44 0.08 93)"
-  risk-3-wash: "oklch(0.935 0.04 93)"
+  risk-3-wash: "oklch(0.945 0.038 93)"
   risk-4: "oklch(0.62 0.1225 61)"
   risk-4-ink: "oklch(0.425 0.09 61)"
-  risk-4-wash: "oklch(0.93 0.042 61)"
+  risk-4-wash: "oklch(0.94 0.04 61)"
   risk-5: "oklch(0.56 0.14 29)"
   risk-5-ink: "oklch(0.41 0.15 29)"
-  risk-5-wash: "oklch(0.925 0.036 29)"
+  risk-5-wash: "oklch(0.935 0.034 29)"
 typography:
   signage:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "4.5rem"
-    fontWeight: 700
-    lineHeight: 0.9
-    letterSpacing: "-0.04em"
-    fontVariation: "wdth 125"
-  figure:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.75rem"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1
     letterSpacing: "-0.03em"
-    fontVariation: "wdth 125"
+  figure:
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "2rem"
+    fontWeight: 600
+    lineHeight: 1.05
+    letterSpacing: "-0.025em"
   title:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.5rem"
-    fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: "-0.02em"
-    fontVariation: "wdth 125"
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.3125rem"
+    fontWeight: 600
+    lineHeight: 1.25
+    letterSpacing: "-0.018em"
   title-sm:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: "-0.015em"
-    fontVariation: "wdth 125"
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.0625rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "-0.012em"
   ui-lg:
     fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1rem"
+    fontSize: "0.9375rem"
     fontWeight: 400
     lineHeight: 1.55
   ui:
     fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.875rem"
+    fontSize: "0.8125rem"
     fontWeight: 400
     lineHeight: 1.5
   ui-sm:
     fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.8125rem"
+    fontSize: "0.75rem"
     fontWeight: 400
     lineHeight: 1.35
   stencil-xs:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.625rem"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1
-    fontVariation: "wdth 125"
   data-xs:
     fontFamily: "Geist Mono, ui-monospace, SFMono-Regular, monospace"
     fontSize: "0.75rem"
-    lineHeight: 1.1
+    lineHeight: 1.2
     fontFeature: "tnum 1"
   eyebrow:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.6875rem"
-    fontWeight: 700
-    lineHeight: 1
-    letterSpacing: "0.08em"
-    fontVariation: "wdth 125"
+    fontWeight: 500
+    lineHeight: 1.1
+    letterSpacing: "0"
 rounded:
   tile: "0"
-  focus: "2px"
-  chip: "3px"
-  md: "0.5rem"
-  sheet: "0.75rem"
+  sm: "0.25rem"
+  md: "0.375rem"
+  sheet: "0.5rem"
 spacing:
-  rule: "2px"
-  rail: "15rem"
+  rule: "1px"
+  rail: "13.75rem"
   measure: "68ch"
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
+    backgroundColor: "{colors.accent-solid}"
     textColor: "{colors.surface-raised}"
     rounded: "{rounded.md}"
-    padding: "0 0.875rem"
-    height: "2.25rem"
+    padding: "0 0.625rem"
+    height: "2rem"
     typography: "{typography.ui}"
-  button-primary-hover:
-    backgroundColor: "{colors.accent-ink}"
-  button-ink:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.surface-raised}"
-    rounded: "{rounded.md}"
-    padding: "0 0.875rem"
-    height: "2.25rem"
   button-outline:
     backgroundColor: "{colors.surface-raised}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
-    padding: "0 0.875rem"
-    height: "2.25rem"
+    padding: "0 0.625rem"
+    height: "2rem"
   button-walk:
-    backgroundColor: "{colors.accent}"
+    backgroundColor: "{colors.accent-solid}"
     textColor: "{colors.surface-raised}"
     rounded: "{rounded.md}"
-    padding: "0 1.25rem"
-    height: "3rem"
+    padding: "0 1rem"
+    height: "2.5rem"
     typography: "{typography.ui-lg}"
   input-md:
-    backgroundColor: "{colors.surface-raised}"
+    backgroundColor: "{colors.surface-sunk}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
     padding: "0 0.625rem"
-    height: "2.25rem"
+    height: "2rem"
   input-lg:
-    backgroundColor: "{colors.surface-raised}"
+    backgroundColor: "{colors.surface-sunk}"
     textColor: "{colors.ink}"
     rounded: "{rounded.md}"
-    padding: "0 0.875rem"
-    height: "3rem"
+    padding: "0 0.75rem"
+    height: "2.5rem"
     typography: "{typography.ui-lg}"
   chip-neutral:
     backgroundColor: "{colors.surface-sunk}"
     textColor: "{colors.ink-soft}"
-    rounded: "{rounded.chip}"
+    rounded: "{rounded.sm}"
     padding: "0.125rem 0.375rem"
     typography: "{typography.ui-sm}"
   tile-band-5:
     backgroundColor: "{colors.risk-5}"
     textColor: "{colors.surface-raised}"
     rounded: "{rounded.tile}"
-    size: "1.75rem"
+    size: "1.5rem"
 ---
 
 # Design System: Risk register
 
 ## Overview
 
-**Creative North Star: "The Duty Manager's Board"**
+**Creative North Star: "The Operating System for a Safety Team"**
 
-The board at reception in a leisure centre: capacity notices, plant readings,
-chalked times, statutory signage, a ruled grid with numbers written into it.
-Things that have to be read at a glance, in bad light, by someone walking
-past who has thirty seconds. That is the register, the assessment document and
-the exported PDF, and it is why this system is built out of ruled grids,
-stencilled numerals and signage colour rather than out of cards and gradients.
+Linear's density and quiet structure, Attio's record-centric layout, Vercel's
+typographic precision — on warm neutrals rather than cold slate, because this
+is a tool people sit in for a working day and cold grey turns clinical after
+an hour.
 
-A centre is a pool **and** a sports hall **and** studios **and** changing
-rooms **and** plant rooms **and** soft play **and** outdoor pitches. No motif
-here may belong to only one of them. The world is the building's shared
-administrative language, not any single room's material.
+It should read as software a professional keeps open, not as a product being
+sold to them. That means restraint everywhere: hairlines instead of cards,
+tone instead of shadow, one accent used sparingly, and a type scale where the
+steps are small and the weight does the work. Nothing here glows, floats,
+blurs or gradients. The interface recedes and the record is what you see.
 
-The register is cool, institutional and unhurried. It is not clinical and it
-is not friendly. Its confidence comes from precision — hairlines that land on
-the pixel, numerals that align down a column, a colour ramp that survives a
-fax machine — rather than from expression. Someone reading this a year later
-is usually reading it because something went wrong.
+The previous system was signage — expanded display type, poolside tile, a
+capacity-notice register. It was distinctive and it is gone deliberately. What
+survives is everything load-bearing: the risk ramp with its greyscale and ISO
+7010 properties, the square matrix, and the rule that severity owns colour.
 
 **Key Characteristics:**
 
-- Ruled grids and hairlines, never cards, and never a card inside a card
-- Stencilled numerals in an expanded display face; the number is the object
-- Two colour systems that never mix: wayfinding teal for interface, the risk
-  ramp for severity
-- Flat by default, with exactly one earned lift
-- Density is per-job: the register is tight, the site-walk form is generous
+- Warm neutral surfaces, hue ~80, in both themes; never blue-black
+- Hairlines and tone carry structure — no cards, no shadows, no glass
+- One family (Geist) at 13px base; hierarchy from weight and tone, not size
+- Small radii: 4px chips, 6px controls, 8px panels, and 0 on risk tiles
+- Two colour systems that never mix: indigo for interface, the ramp for
+  severity
+- Light and dark are the same system with the tokens swapped — no component
+  in the app knows which is active
 
 ## Colors
 
-A cool institutional neutral field, one wayfinding accent, and a five-step
-severity ramp that is treated as data rather than as decoration.
+A warm neutral field, one indigo accent, and a five-step severity ramp that is
+data rather than decoration. Roughly 60/30/10: most of any screen is neutral
+surface, and colour appears only where it carries meaning.
 
 ### Primary
 
-- **Wayfinding Teal** (`{colors.accent}`): The interface's only accent. Links,
-  primary actions, focus rings, the active rail indicator, selection
-  highlight. Named for the blue-green of leisure-centre signage and floor
-  markings — not for the pool. It never means severity.
-- **Wayfinding Teal Deep** (`{colors.accent-ink}`): Hover and pressed states,
-  and teal used as text on a light surface where the base tone is too light
-  to hold 4.5:1.
-- **Wayfinding Wash** (`{colors.accent-wash}`): Selection background,
-  `::selection`, and the tint under an active filter.
+- **Indigo** (`{colors.accent}`): links, focus rings, the active rail marker,
+  selection. Bright in dark, deep in light — it has to hold 4.5:1 against
+  whichever canvas is behind it.
+- **Indigo Solid** (`{colors.accent-solid}`): the accent as a *surface* — the
+  primary button fill, with white on it. Deliberately a separate token: a
+  colour bright enough to read as a link on near-black is too bright to put
+  white on, and one dark enough for white text disappears as a link. Two
+  tokens, one job each, and this one does not move between themes.
+- **Indigo Wash** (`{colors.accent-wash}`): selection background, the tint
+  under an active filter.
 
 ### Secondary
 
 The five-step severity ramp. It is a **scale**, not a palette, and each step
 ships four tokens: the tile fill, the text colour for that fill, an ink
-version for type on a light surface, and a wash for chip backgrounds.
+version for type on the canvas, and a wash for chip backgrounds.
 
 - **Band 1 — Clear** (`{colors.risk-1}`): Very low, scores 1–4.
 - **Band 2 — Watch** (`{colors.risk-2}`): Low, scores 5–9.
-- **Band 3 — Act** (`{colors.risk-3}`): Moderate, scores 10–12. This is where
-  the escalation threshold sits: 10 and above requires a documented action.
+- **Band 3 — Act** (`{colors.risk-3}`): Moderate, scores 10–12. The escalation
+  threshold: 10 and above requires a documented action.
 - **Band 4 — Escalate** (`{colors.risk-4}`): High, scores 13–16.
 - **Band 5 — Stop** (`{colors.risk-5}`): Very high, scores 17–25.
 
+The fills are **identical in both themes**. They are a safety encoding, not
+decoration, and re-tuning them per theme would break the printed key. Only the
+band-as-text and chip-background tokens invert, because a colour legible on
+paper is not legible on near-black.
+
 ### Neutral
 
-- **Board Slate** (`{colors.ink}`): All primary text, the sign-in panel, and
-  terminal actions such as sign-off. Never pure black.
-- **Board Slate Soft** (`{colors.ink-soft}`): Secondary text, field labels.
-- **Muted** (`{colors.muted}`): Every quiet text role — supporting prose,
-  column headers, placeholders, review dates, empty states, keyboard hints.
-  Tuned against `surface-sunk`, the darkest surface it lands on, so it clears
-  4.5:1 on all three: 5.49 raised, 5.00 surface, 4.68 sunk. **It is the
-  lightest text tone that exists**, and there is deliberately nothing below
-  it.
-- **Painted Wall** (`{colors.surface}`): The page. A cool off-white, never
-  pure white.
-- **Card Stock** (`{colors.surface-raised}`): The only white in the system,
-  and only ever as a plane — panels, the rail, sheets, table bodies.
-- **Recess** (`{colors.surface-sunk}`): Pressed and hovered states, disabled
-  fields, the tone that reads as set-into the surface.
-- **Rule** (`{colors.rule}`) and **Rule Strong** (`{colors.rule-strong}`):
-  Hairlines. `rule` divides content; `rule-strong` bounds an interactive
-  edge such as an input or an outline button.
+- **Ink** (`{colors.ink}`): all primary text. Never pure black, never pure
+  white.
+- **Ink Soft** (`{colors.ink-soft}`): secondary text, field labels.
+- **Muted** (`{colors.muted}`): every quiet role — supporting prose, column
+  heads, placeholders, metadata. Tuned against the darkest surface it lands
+  on: 5.38 raised / 5.07 canvas / 4.73 sunk. **The lightest text tone that
+  exists**, with nothing below it.
+- **Surface** (`{colors.surface}`): the canvas.
+- **Surface Raised** (`{colors.surface-raised}`): panels, rows, overlays.
+- **Surface Sunk** (`{colors.surface-sunk}`): inputs, pressed states, anything
+  set *into* the page.
+- **Rule** / **Rule Strong**: hairlines. `rule` divides; `rule-strong` bounds
+  an interactive edge.
 
 ### Named Rules
 
-**The Two Scales Rule.** Wayfinding teal and the risk ramp are separate
-systems and may never be substituted for one another. Teal never encodes
-severity; a risk colour never marks a link, a button or a focus ring. A screen
-where the two are confusable is a defect, not a style choice.
+**The Two Scales Rule.** Indigo and the risk ramp are separate systems and may
+never be substituted for one another. Indigo never encodes severity; a risk
+colour never marks a link, a button or a focus ring. The accent hue sits
+outside the ramp's range so the two can never be confused.
 
-**The Greyscale Rule.** The ramp descends in lightness by ~0.06 per step while
-chroma ascends, so it survives a monochrome printout: an inspector can tell a
-20 from a 6 with no colour at all. Any new colour added to the ramp must hold
-that property, and must be checked as a greyscale render, not by eye.
+**The Greyscale Rule.** The ramp descends in lightness while chroma ascends, so
+it survives a monochrome printout: an inspector can tell a 20 from a 6 with no
+colour at all. Any new ramp colour must hold that property, checked as a
+greyscale render rather than by eye.
 
 **The Never-Colour-Alone Rule.** Risk level is always carried by the numeral
-and the band word as well as the fill. No state in this product may be
-readable only by hue.
+and the band word as well as the fill. No state may be readable only by hue.
 
 **The Signage Crossover Rule.** Text on a band fill is dark on bands 1–4 and
-white on band 5, at 4.98:1 — the same crossover ISO 7010 makes between a black
--on-yellow warning and a white-on-red prohibition. The crossover point is a
-contrast measurement, not a preference.
+white on band 5 — the crossover ISO 7010 makes between a black-on-yellow
+warning and a white-on-red prohibition. The crossover point is a contrast
+measurement, not a preference, and the dark tone is its own token rather than
+the text ink: when the ink lightened, band 4 lost its headroom.
+
+**The Legible Floor Rule.** Every text tone clears 4.5:1 on every surface it
+can land on, **in both themes**. If a design wants something quieter than
+`muted`, the answer is less text, smaller text, or more space — never a
+lighter grey. Linear's own tertiary tone measures about 3.2:1 on its canvas;
+that is not available here, because WCAG 2.2 AA is a legal duty for this
+operator.
 
 ## Typography
 
-**Display Font:** Archivo, at width axis 125 (with `ui-sans-serif`,
-`system-ui`)
-**Body Font:** Geist (with `ui-sans-serif`, `system-ui`)
-**Label/Mono Font:** Geist Mono (with `ui-monospace`, `SFMono-Regular`)
+**One family: Geist** (with `ui-sans-serif`, `system-ui`), and **Geist Mono**
+for anything that has to line up in a column.
 
-**Character:** The expanded width axis on Archivo is what gives the
-institutional signage register — without it this is just a bold sans, and the
-whole world collapses into generic SaaS. Geist carries interface text at small
-sizes without personality getting in the way; Geist Mono carries anything that
-has to line up in a column. Three roles, no overlap: display announces, sans
-explains, mono measures.
+**Character:** Geist is Vercel's own face and is drawn for interface density.
+There is deliberately no third display voice — at 13px base a separate display
+face fragments the page, and the hierarchy is carried by size, weight and tone
+working together. The previous system's expanded display face is gone with the
+signage world it belonged to.
 
 ### Hierarchy
 
-- **Signage** (`{typography.signage}`): The single numeral a screen is about,
-  at the scale of a capacity notice — read from across a room, not from a
-  chair. Strictly one per view, and only inside a band-coloured block.
-- **Figure** (`{typography.figure}`): Report headline numbers and the sign-in
-  wordmark. One per view at most.
-- **Title** (`{typography.title}`): Page titles.
-- **Title Small** (`{typography.title-sm}`): Sheet headings, section headings
-  inside a document, empty-state headings.
-- **UI Large** (`{typography.ui-lg}`): The authoring form. Deliberately a step
-  up from the interface default because it is read at arm's length on a tablet
-  while standing.
-- **UI** (`{typography.ui}`): The interface default.
-- **UI Small** (`{typography.ui-sm}`): Register rows, chips, field labels.
-- **Stencil XS** (`{typography.stencil-xs}`): The numeral or code inside a
-  small square tile — band numbers in filter chips, centre codes. The only
-  step below the data role, and only ever inside a tile.
-- **Data XS** (`{typography.data-xs}`): References, dates, coordinates, any
-  figure in a column. Tabular figures are forced globally, not left to a
-  utility class being remembered.
-- **Eyebrow** (`{typography.eyebrow}`): Small-caps labels — `<dt>` terms in
-  document metadata, matrix axis labels, section markers.
+A ~1.2 ratio from a 13px base. The steps are small on purpose; weight and tone
+separate them further than size alone could.
+
+- **Signage** (`{typography.signage}`): the single numeral a screen is about.
+  One per view, only inside a band-coloured block.
+- **Figure** (`{typography.figure}`): report headline numbers.
+- **Title** (`{typography.title}`): page titles.
+- **Title Small** (`{typography.title-sm}`): sheet and section headings.
+- **UI Large** (`{typography.ui-lg}`): the site-walk form, read at arm's
+  length on a tablet.
+- **UI** (`{typography.ui}`): the default, 13px.
+- **UI Small** (`{typography.ui-sm}`): dense rows, chips.
+- **Stencil XS** (`{typography.stencil-xs}`): the numeral inside a small tile.
+- **Data XS** (`{typography.data-xs}`): references, dates, coordinates —
+  anything comparable down a column, with tabular figures forced globally.
+- **Eyebrow** (`{typography.eyebrow}`): column heads, metadata terms, section
+  labels. Small and quiet — **not** letterspaced small caps, which shout at
+  this density.
 
 ### Named Rules
 
 **The Tabular Rule.** Anything a reader might compare down a column is set in
-the data role with `tnum` on. A reference number or a date in the sans face is
-a bug — the columns will not align, and misaligned figures in a safety record
-read as carelessness.
+the data role with `tnum` on. Misaligned figures in a safety record read as
+carelessness.
 
-**The Width Axis Rule.** The display face is only the display face at width
-125. Shipping Archivo at its default width is a failure to use the type, not a
-neutral fallback.
+**The Three Levers Rule.** Hierarchy is built from size, weight and tone
+together, never size alone. At this density two steps of size are nearly
+invisible; a weight change is not.
 
-**The Measure Rule.** Document and report prose is capped at 68ch. The
-register is exempt: a table is scanned in columns, not read in lines.
+**The Measure Rule.** Document and report prose is capped at 68ch. The register
+is exempt: a table is scanned in columns, not read in lines.
+
+**The One Numeral Rule.** Exactly one figure per view may take the signage
+step, and it must sit inside a band-coloured block.
 
 ## Layout
 
-A fixed 15rem navigation rail on the left from the `md` breakpoint up, holding
-the centre switcher and main nav; below `md` it collapses to a sticky top bar.
-Content fills the remainder with no outer max-width — the register is
-deliberately full-bleed, because horizontal room is what buys another column,
-and another column is the whole value of the register.
+A fixed 220px navigation rail on the left from the `md` breakpoint up, on the
+same surface as the canvas rather than a different colour — a different tone
+would fragment the app into "sidebar world" and "content world". A hairline is
+enough. Below `md` it collapses to a sticky bar.
 
-Detail opens as a right-side sheet over the register rather than as a route
-change, so the row a manager was reading stays visible behind it. On mobile the
-same sheet enters from the bottom and caps at 88vh. Sheets are the only
-overlay; there are no modals for tasks that need neither interruption nor
-protected focus.
+Content fills the remainder with no outer max-width. The register is
+full-bleed: horizontal room buys a column, and the columns are the product.
 
-Density is set per job, not globally. The register uses the small interface
-size with tight row padding and a sticky header. The authoring flow uses the
-large size throughout, with 3rem control heights, because it is operated
-one-handed on a tablet during a site walk. The assessment document sits between
-them and is constrained to the reading measure.
+Detail opens as a **contextual side panel** over the register rather than as a
+route change, so the row a manager was reading stays visible behind it. On
+mobile the same panel enters from the bottom. Panels are the only overlay —
+there are no modals for tasks needing neither interruption nor protected focus.
 
-Grids that read as a ruled board — the matrix, the tile field on sign-in — use
-a 2px gap in the rule colour with matching padding, so the rule shows through
-as the lines between cells rather than as a border around them.
+**Command-driven.** ⌘K is a first-class way to move, not a convenience: the
+palette reaches every centre, assessment and screen. Navigation should be
+possible without the mouse, and the rail is the fallback rather than the
+primary route.
 
-Inputs are forced to 16px below the `md` breakpoint. Anything smaller makes iOS
-zoom the viewport, which on a site walk means the assessor loses their place
-mid-form.
+Density is set per job. The register runs 44px rows at the small interface
+size with a sticky header. The authoring flow uses the large size with 40px
+controls, because it is operated one-handed on a tablet during a site walk —
+that size is not a visual choice and must not be traded away for balance.
+
+Grids that read as a ruled board — the matrix — use a 1px gap in the rule
+colour, so the hairline shows through as the line between cells rather than as
+a border around them.
+
+Inputs are forced to 16px below `md`, or iOS zooms the viewport and the
+assessor loses their place mid-form.
 
 ## Elevation & Depth
 
-**Flat, with one earned lift.** Surfaces are separated by hairlines and by tone
-— `surface` for the page, `surface-raised` for planes, `surface-sunk` for
-recessed and pressed states. There is no ambient shadow vocabulary, no card
-elevation scale, and no glass.
+**Flat. Structure comes from hairlines and tone, and nothing else.**
 
-The single exception is the selected cell of the risk matrix, which rises 3px
-on a hard, zero-blur offset shadow in the ink tone, with an inset ink ring. It
-is physical rather than atmospheric — a tile pushed proud of the board, not a
-floating card. It is the only place in the system where anything lifts, and
-that rationing is what makes it read as "this is the one you chose" at arm's
-length on a tablet.
+There is no shadow vocabulary, no card elevation scale, no glass, no blur as
+decoration. Surfaces separate by a single tone step — `surface` for the
+canvas, `surface-raised` for planes, `surface-sunk` for anything recessed —
+and the steps are deliberately small enough that you feel them rather than see
+them. Inputs take the *sunk* tone: an input receives content, so it should
+read as set into the page, not floating on it.
 
-The one other use of shadow is the sheet overlay: a flat ink scrim at 25%,
-carrying a 1px backdrop blur — just enough to stop fine table rules shimmering
-through the scrim, and far short of glass.
+This holds in dark, where it has to: shadows do not read on near-black, so a
+system that leaned on them would lose all its structure on theme switch.
+
+The one exception is the selected cell of the risk matrix, which rises on a
+hard offset in the ink tone with an inset ring. It is physical rather than
+atmospheric — a tile pushed proud of the board — and it is the only thing in
+the system that lifts.
 
 ### Named Rules
 
-**The One Lift Rule.** Exactly one element in this system rises off the
-surface, and it is the selected matrix cell. A second one devalues the first.
-If a new element seems to need elevation, it needs a hairline or a tone step
-instead.
+**The One Lift Rule.** Exactly one element rises off the surface, and it is the
+selected matrix cell. If something else seems to need elevation, it needs a
+hairline or a tone step instead.
 
-**The One Numeral Rule.** Exactly one figure per view may take the signage
-step, and it must sit inside a band-coloured block. A second one turns a
-statement into a dashboard.
-
-**The Legible Floor Rule.** Every text tone in this system clears 4.5:1 on
-every surface it can land on. If a design needs something quieter than
-`muted`, the answer is less text, smaller text, or more space — never a
-lighter grey. This rule exists because the palette once carried a fourth grey
-and all fifteen of its content uses failed WCAG AA.
+**The Squint Rule.** Blurred, the interface should still show what is above
+what and where sections divide, with nothing jumping out. If a border is the
+first thing you see, it is too strong.
 
 ## Shapes
 
-Two form languages, deliberately in tension.
+Small radii throughout: 4px on chips and tiny controls, 6px on buttons, inputs
+and rows, 8px on panels. A large radius on a dense control reads as a toy.
 
-The interface is softly rounded at 0.5rem — buttons, inputs, panels, rail
-items — with sheets slightly softer at 0.75rem. This is the administrative
-layer, and it is unremarkable on purpose.
+The risk system is **square** — 0 radius. Matrix cells and tile chips have no
+rounding at all, and that squareness is the one visual signal separating "this
+is data about danger" from "this is interface".
 
-The risk system is **square**. Matrix cells, tile chips and the sign-in tile
-field have no radius at all. The squareness is what makes them read as tile,
-signage and board rather than as badges, and it is the one visual signal that
-separates "this is data about danger" from "this is interface". Chips that
-carry anything other than risk take a 3px radius — nearly square, but not
-quite, so the two are distinguishable at a glance.
-
-The focus ring carries its own 2px radius, tighter than anything it surrounds.
-It is deliberately not the interface radius: the ring should read as drawn
-around an element rather than as part of it, and it has to sit correctly around
-square tiles and rounded buttons alike.
-
-Borders are hairlines in the rule tone, on every side, at 1px. The system does
-not use borders for emphasis.
+Borders are hairlines in the rule tone, 1px, and are never used for emphasis.
 
 ## Components
 
 ### Buttons
 
-- **Shape:** Softly rounded (0.5rem). Never pill, never square.
-- **Primary:** Wayfinding teal with white label, for the main affirmative
-  action on a screen.
-- **Ink:** Board slate with a light label. Reserved for terminal, irreversible
-  actions — sign-off above all — because they are heavier than an ordinary
-  primary action and should not look like one.
-- **Outline / Ghost / Link:** Hairline-bounded, transparent, and underlined
-  respectively. Outline is the default variant; most buttons in this product
-  are not the main action.
-- **Danger:** Band-5 wash with band-5 ink and a band-5 hairline, inverting to
-  a solid band-5 fill on hover. The only place a risk colour appears on a
-  control, and it is permitted because the control's meaning *is* severity.
-- **Sizes:** Three heights — 2rem compact, 2.25rem default, and 3rem for the
-  site-walk flow. The large size exists for one-handed tablet use and must not
-  be traded away for visual balance.
-- **Hover / Focus:** Background shifts over 120ms. Focus is the global ring:
-  a 2px teal outline at 2px offset, on every interactive element without
-  exception.
-- No gradients, no drop shadows, and no icon in every button. A button is a
-  rectangle with a label that says what happens.
+- **Shape:** 6px. Never pill, never square.
+- **Sizes:** 28px compact, 32px default, 40px for the site-walk flow.
+- **Primary:** indigo solid with a white label, for the one affirmative action
+  on a screen.
+- **Ink:** near-black with a light label. Reserved for terminal, irreversible
+  actions — sign-off above all — because they should not look like an ordinary
+  primary action.
+- **Outline / Ghost / Link:** hairline-bounded, transparent, underlined. Outline
+  is the default variant; most buttons here are not the main action.
+- **Danger:** band-5 wash, ink and hairline, inverting to a solid band-5 fill
+  on hover. The only place a risk colour appears on a control, permitted
+  because the control's meaning *is* severity.
+- **Press:** `scale(0.98)` on `:active`. Tactile confirmation, nothing more.
+- No gradients, no drop shadows, no icon in every button.
 
 ### Chips
 
-- **Style:** 3px radius, tight padding, small interface size. Neutral chips
-  take the recessed tone; risk chips take their band's wash with that band's
-  ink.
-- **State:** Filter chips in the register show selection as a wash and a
-  hairline, never as a colour swap that could be mistaken for a risk band.
+4px radius, tight padding, 24px minimum height. Neutral chips take the
+recessed tone; risk chips take their band's wash with that band's ink. Filter
+chips show selection as a wash and a hairline, never as a colour swap that
+could be mistaken for a risk band.
 
 ### Cards / Containers
 
-There are no cards. Content sits on planes in the raised tone, bounded by
-hairlines and separated by space. A card inside a card is always wrong, and a
-grid of same-size icon-plus-heading-plus-text panels is not a layout this
-system has.
+There are none. Content sits on planes bounded by hairlines and separated by
+space. A card inside a card is always wrong, and a grid of same-size
+icon-plus-heading-plus-text panels is not a layout this system has.
 
 ### Inputs / Fields
 
-- **Style:** Raised-tone fill, `rule-strong` hairline, 0.5rem radius. Two
-  densities: 2.25rem for the register's filter row, 3rem for authoring.
-- **Focus:** Border shifts to teal and the global focus ring appears.
-- **Error:** Border shifts to band 5, `aria-invalid` is set, and the message
-  is wired with `aria-describedby` — never a red sentence floating near a box.
-- Every field has a real `<label>`. Placeholder-as-label does not exist here.
+Recessed fill, hairline border, 6px radius, lifting to the raised tone on
+focus. Two densities: 32px for the register's filter row, 40px for authoring.
+Errors shift the border to band 5, set `aria-invalid` and wire the message with
+`aria-describedby` — never a red sentence floating near a box. Every field has
+a real `<label>`; placeholder-as-label does not exist here.
 
 ### Navigation
 
-- **Style:** A 15rem rail on the raised tone with a hairline right edge.
-  Items are interface-small, rounded, and quiet at rest.
-- **Active:** A 2px teal bar inset at the left edge of the item, plus a tone
-  change. The bar is the only persistent use of the accent as a marker.
-- **Mobile:** The rail collapses into a sticky top bar with the same items
-  behind a trigger.
-
-### Register Rows
-
-- **Status is shape and weight, never colour.** Risk owns colour, so status
-  earns its distinction another way: draft is rule-outlined, signed off is a
-  filled ink chip. A row of coloured status pills would put a second colour
-  system next to the risk ramp and make both unreadable.
-- **Overdue** is marked with a left edge-rule and a day count in the data role.
-  Visually distinct, not alarming, and it survives greyscale.
-- Rows are the small interface size with tight padding and a sticky header.
-  The table scrolls horizontally rather than dropping columns.
-
-### Charts
-
-Hairline-ruled, no gridline fill, no legend where a direct label will do.
-
-**One chart on the reports screen, not three.** Two bar charts were removed
-because each plotted one or two bars against a 0–4 axis and restated a column
-the comparison table already carries per centre. A chart holding three numbers
-is a decoration of a number, and on a page an inspector reads, decoration
-costs credibility. What survives is the only series with a shape: mean
-residual over twelve months.
-
-Every chart has a print variant, because the figure an inspector sees is the
-printed one.
-
-### The Verdict Masthead
-
-The reports screen opens with the answer, not the evidence: a band-coloured
-block carrying the group's worst residual at signage scale, one plain sentence
-naming the centre, and the group's four standing figures demoted beneath it.
-Each of those figures appears exactly once on the page — the layout it
-replaced printed two of them twice.
+A 220px rail on the canvas tone with a hairline right edge, items at the small
+interface size, quiet at rest. Active state is a 2px indigo bar inset at the
+left edge plus a tone change — the only persistent use of the accent as a
+marker.
 
 ### The Tile Matrix (signature)
 
-The 5×5 likelihood × severity grid, rendered as a ruled board. Square cells,
-2px rule-coloured gaps, stencilled numerals in the display face at width 125.
-Likelihood ascends upward, as on every printed matrix an assessor has ever
-seen — inverting it to match screen coordinates would be technically tidier and
-practically wrong.
+The 5×5 likelihood × severity grid as a ruled board. Square cells, 1px
+rule-coloured gaps, tabular numerals. Likelihood ascends upward, as on every
+printed matrix an assessor has seen — inverting it to match screen coordinates
+would be tidier and practically wrong.
 
-You tap into a cell. There are no dropdowns for likelihood and severity, ever:
-the two-dropdown pattern hides the shape of the risk, and the shape is the
-point. Unselected cells sit at 70% opacity so the field reads as one board
-rather than 25 competing swatches; the selected cell comes to full strength and
-takes the one earned lift.
+You tap into a cell. There are no dropdowns for likelihood and severity: the
+two-dropdown pattern hides the shape of the risk, and the shape is the point.
+Unselected cells sit back so the field reads as one board rather than 25
+competing swatches; the selected cell comes to full strength and takes the one
+lift.
 
-The whole grid is a single tab stop with roving focus. Arrow keys walk it,
-Enter and Space commit, Home and End jump to the corners. Every cell names its
+The whole grid is a single tab stop with roving focus — arrows walk it, Enter
+and Space commit, Home and End jump to the corners — and every cell names its
 likelihood, severity, score and band in words for a screen reader.
 
 Its reduced form, the **tile chip**, carries the same square tile into the
-register and the PDF: the score numeral in the band fill, with the L×S
-coordinate beside it in the data role. Two per row — initial and residual — so
-scanning down the column shows the step-down that controls achieved, without
-reading a number.
+register and the PDF: the score numeral in the band fill with the L×S
+coordinate beside it in the data role. Two per row, initial and residual, so
+scanning the column shows the step-down controls achieved without reading a
+number.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** keep wayfinding teal and the risk ramp completely separate. If a
-  screen makes them confusable, that is a defect.
-- **Do** carry risk level in the numeral and the band word as well as the
-  fill, every time.
+- **Do** keep indigo and the risk ramp completely separate.
+- **Do** carry risk level in the numeral and the band word as well as the fill.
 - **Do** check any new ramp colour as a greyscale render before accepting it.
+- **Do** verify contrast in **both** themes. A tone that passes on paper can
+  fail on near-black, and the duty applies to both.
 - **Do** set anything comparable down a column in the data role with tabular
   figures.
-- **Do** use the 3rem control size throughout the authoring flow. It exists for
-  one-handed tablet use on a site walk.
-- **Do** keep the register full-bleed. Horizontal room buys a column, and the
-  columns are the product.
-- **Do** treat the print stylesheet as product surface. The PDF is what an
-  inspector reads, and it is rendered from this CSS by headless Chromium.
-- **Do** ship the display face at width axis 125.
+- **Do** keep the 40px control size in the authoring flow.
+- **Do** keep the register full-bleed.
+- **Do** treat the print stylesheet as product surface — and keep it light,
+  whatever the screen theme is doing.
 
 ### Don't:
 
-- **Don't** add a second element that lifts off the surface. One is the whole
-  budget, and it belongs to the selected matrix cell.
-- **Don't** round the matrix cells or the tile chips. The squareness is what
-  separates danger data from interface.
+- **Don't** introduce a shadow, a glass effect or a gradient. Structure is
+  hairlines and tone.
+- **Don't** add a second element that lifts off the surface.
+- **Don't** round the matrix cells or the tile chips.
 - **Don't** reach for a card, and never nest one.
-- **Don't** use a risk colour on a control, except the danger button, whose
-  meaning genuinely is severity.
-- **Don't** replace the matrix with two dropdowns, however much simpler the
-  form would be.
-- **Don't** add a fourth grey below `muted`. One existed and every use of it
-  failed contrast; the value that would have fixed it *is* `muted`.
-- **Don't** ship the display face at its default width.
-- **Don't** introduce a motif that belongs to only one room of the building.
-  A centre is a pool and a hall and studios and changing rooms and plant rooms
-  and soft play and outdoor pitches.
-- **Don't** animate on scroll, bounce, or stagger. Motion is a 120ms state
-  change or a 240ms settle, and everything collapses under
-  `prefers-reduced-motion`.
-- **Don't** give status its own colour system. Status is shape and weight;
-  colour belongs to risk.
+- **Don't** use a risk colour on a control, except the danger button.
+- **Don't** replace the matrix with two dropdowns.
+- **Don't** add a fourth grey below `muted`.
+- **Don't** give the rail a different surface tone from the canvas.
+- **Don't** give status its own colour system. Status is shape and weight.
 - **Don't** add a KPI row or a grid of donuts to reports. One verdict, one
   comparison, one trend, one distribution.
-- **Don't** print the same figure twice on one screen. If it belongs in the
-  masthead it does not also belong in a footer list.
+- **Don't** print the same figure twice on one screen.
 - **Don't** chart a number that has no shape. Three data points belong in a
   table.
-- **Don't** route to a full page for assessment detail. It opens as a
-  deep-linkable right sheet so the manager never loses their place in the
-  register.
+- **Don't** animate on scroll, bounce, or stagger. Motion is a 110ms state
+  change or a 180ms settle, and everything collapses under
+  `prefers-reduced-motion`.

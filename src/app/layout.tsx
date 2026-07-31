@@ -1,24 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
 /**
- * Three type roles, and the contrast between them does the work.
+ * One family, two cuts.
  *
- * Archivo carries a `wdth` axis — loading it is what gives the Expanded
- * width the display role depends on. Without the axis this is just another
- * bold sans and the institutional signage register is lost.
+ * Geist is Vercel's own face and is drawn for interface density; the mono cut
+ * carries anything that has to line up in a column. There is no third display
+ * face: at this density a separate display voice fragments the page, and
+ * hierarchy is carried by size, weight and tone instead.
  */
-// `weight` is deliberately omitted: declaring the `wdth` axis requires the
-// variable font, and a fixed weight list would pin it to static instances.
-const display = Archivo({
-  subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--ff-display",
-  display: "swap",
-});
-
 const body = Geist({
   subsets: ["latin"],
   variable: "--ff-body",
@@ -41,7 +33,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B1417",
+  // Matches --color-surface in each theme. Unavoidably a literal: a viewport
+  // export cannot read a CSS variable.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FAF9F7" },
+    { media: "(prefers-color-scheme: dark)", color: "#1B1A18" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -50,7 +47,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en-GB" className={`${body.variable} ${mono.variable}`}>
       <body className="min-h-dvh antialiased">
         {children}
         <Toaster
